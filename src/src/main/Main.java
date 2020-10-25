@@ -7,7 +7,17 @@ package main;
  */
 
 import engine.*;
+import engine.drawing.Camera;
+import engine.drawing.Draw;
+import engine.physics.Physics;
+import engine.physics.Rect;
+import main.entities.Entity;
+import main.entities.map.Wall;
 import main.map.LoadMap;
+import main.map.Map;
+
+import java.awt.Color;
+
 
 public class Main extends GameJava {
 
@@ -25,8 +35,9 @@ public class Main extends GameJava {
         super(800, 600, 60, 60);
 
         LoadMap.loadMap(baseDirectory + directoryChar + "levels" + directoryChar + "second.txt");
+        Camera.centerOn(1000,1000);
 
-        // LoopManager.startLoops(this);
+        LoopManager.startLoops(this);
     }
 
     @Override
@@ -41,6 +52,19 @@ public class Main extends GameJava {
             case PLAYING:
                 break;
         }
+
+        if (Input.keyDown(KeyCodes.W)) {
+            Camera.y += 5;
+        }
+        if (Input.keyDown(KeyCodes.A)) {
+            Camera.x += 5;
+        }
+        if (Input.keyDown(KeyCodes.S)) {
+            Camera.y -= 5;
+        }
+        if (Input.keyDown(KeyCodes.D)) {
+            Camera.x -= 5;
+        }
     }
 
     @Override
@@ -54,6 +78,17 @@ public class Main extends GameJava {
                 break;
             case PLAYING:
                 break;
+        }
+
+        Draw.setColor(new Color(30, 30, 30));
+        Draw.rect(-Camera.x + gw / 2, -Camera.y + gh / 2, gw / (int) Camera.zoom, gh / (int) Camera.zoom);
+
+        int w = Map.img.getWidth();
+        int h = Map.img.getHeight();
+        Draw.image(Map.img, w/2, h/2, w, h);
+
+        for(int i=0;i<Entity.entities.size();i++) {
+            Entity.entities.get(i).draw();
         }
     }
 
@@ -70,4 +105,20 @@ public class Main extends GameJava {
                 break;
         }
     }
+
+    public static Entity colliding(Rect r) {
+
+        for(int i=0;i<Map.walls.length;i++) {
+            Rect rect = Map.walls[i].rect;
+            if(! (rect.x == r.x && rect.y == r.y)) {
+                continue;
+            }
+
+            if(Physics.rectrect(rect, r)) {
+                return Entity.class.cast(Map.walls[i]);
+            }
+        }
+
+        return null;
+    } 
 }

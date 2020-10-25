@@ -1,6 +1,6 @@
 package main.map;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +15,7 @@ public class RenderMap {
             Map.img = new BufferedImage(Map.tiles[0].length * Constants.TILE_SCALE,
                     Map.tiles.length * Constants.TILE_SCALE, 1);
 
-            Graphics g = Map.img.getGraphics();
+            Graphics2D g = Map.img.createGraphics();
 
             for (int y = 0; y < Map.tiles.length; y++) {
                 for (int x = 0; x < Map.tiles[0].length; x++) {

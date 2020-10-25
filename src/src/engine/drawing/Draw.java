@@ -16,6 +16,7 @@ import java.awt.RenderingHints;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.FontFormatException;
+import java.awt.Image;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -304,6 +305,17 @@ public class Draw extends JPanel {
         if ((x + half > drawLimitLeft && x - half < drawLimitRight && y + half > drawLimitTop && y - half < drawLimitBottom) || absoluteDraw) {
             canvas.drawImage(spr.img, Math.round(x + difx - (spr.width / 2)), Math.round(y + dify - (spr.height / 2)), null);
         drawCalls++;}
+    }
+
+    /**
+     * draws an image centered on x,y
+     * @param img 
+     * @param x
+     * @param y
+     */
+    public static void image(Image img, int x, int y, int w, int h) {
+        canvas.drawImage(img, Math.round(x + difx - (w / 2)), Math.round(y + dify - (h / 2)), null);
+        drawCalls++;
     }
 
     /**

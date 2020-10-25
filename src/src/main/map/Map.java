@@ -1,5 +1,6 @@
 package main.map;
 
+import main.entities.map.Wall;
 import main.map.tiles.Tile;
 
 import java.awt.image.BufferedImage;
@@ -7,6 +8,8 @@ import java.awt.image.BufferedImage;
 public class Map {
     public static Tile[][] tiles;
     public static Object[] objects;
+
+    public static Wall[] walls;
     
     public static BufferedImage img;
 }
