@@ -7,14 +7,12 @@ package main;
  */
 
 import engine.*;
+import main.map.LoadMap;
 
 public class Main extends GameJava {
 
     enum State {
-        TITLE,
-        CUTSCENE,
-        TRANSITION,
-        PLAYING
+        TITLE, CUTSCENE, TRANSITION, PLAYING
     }
 
     State state = State.TITLE;
@@ -26,12 +24,14 @@ public class Main extends GameJava {
     public Main() {
         super(800, 600, 60, 60);
 
-        LoopManager.startLoops(this);
+        LoadMap.loadMap(baseDirectory + directoryChar + "levels" + directoryChar + "second.txt");
+
+        // LoopManager.startLoops(this);
     }
 
     @Override
     public void update() {
-        switch(state) {
+        switch (state) {
             case TITLE:
                 break;
             case CUTSCENE:
@@ -45,7 +45,7 @@ public class Main extends GameJava {
 
     @Override
     public void draw() {
-        switch(state) {
+        switch (state) {
             case TITLE:
                 break;
             case CUTSCENE:
@@ -59,7 +59,7 @@ public class Main extends GameJava {
 
     @Override
     public void absoluteDraw() {
-        switch(state) {
+        switch (state) {
             case TITLE:
                 break;
             case CUTSCENE:
