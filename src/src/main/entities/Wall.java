@@ -1,4 +1,4 @@
-package main.entities.map;
+package main.entities;
 
 import java.awt.Color;
 
@@ -17,7 +17,7 @@ public class Wall extends Entity {
     public void draw() {
         if(Utils.debugMode) {
             Draw.setColor(Color.WHITE);
-            Draw.rectOutline(this.rect);
+            Draw.rectOutline(rect);
         }
     }
 }

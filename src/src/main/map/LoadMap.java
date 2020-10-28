@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import main.entities.Entity;
-import main.entities.map.Wall;
+import main.entities.Wall;
 import main.map.objects.ObjectParser;
 import main.map.tiles.TileParser;
 

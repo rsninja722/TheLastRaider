@@ -3,7 +3,7 @@ package main.map;
 import java.util.ArrayList;
 
 import main.Constants;
-import main.entities.map.Wall;
+import main.entities.Wall;
 import main.map.tiles.Tile;
 import main.map.tiles.Tile.tileTypes;
 

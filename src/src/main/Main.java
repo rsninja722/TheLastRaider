@@ -13,8 +13,8 @@ import engine.drawing.Sprites;
 import engine.physics.Physics;
 import engine.physics.Rect;
 import main.entities.Entity;
-import main.entities.map.Wall;
-import main.entities.moveable.Movable;
+import main.entities.Wall;
+import main.entities.moveable.Moveable;
 import main.entities.moveable.combat.Player;
 import main.map.LoadMap;
 import main.map.Map;
@@ -41,9 +41,9 @@ public class Main extends GameJava {
         Camera.centerOn(1000,1000);
 
         Entity.entities.add(new Player(1400, 184, 12, 12));
-        Entity.entities.add(new Movable(1400, 200, 16, 16));
-        Entity.entities.add(new Movable(1400, 220, 16, 16));
-        Entity.entities.add(new Movable(1400, 250, 16, 16));
+        Entity.entities.add(new Moveable(1400, 200, 16, 16));
+        Entity.entities.add(new Moveable(1400, 220, 16, 16));
+        Entity.entities.add(new Moveable(1400, 250, 16, 16));
 
         LoopManager.startLoops(this);
     }

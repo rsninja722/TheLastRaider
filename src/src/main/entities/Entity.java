@@ -23,22 +23,19 @@ public class Entity {
     public void draw() {
     }
 
-    public Rect applyForce(double xVel, double yVel) {
+    public void move() {
+    }
+
+    public void applyForce(double xVel, double yVel) {
         return null;
     }
 
-    public static Entity colliding(Rect r, ArrayList<Entity> exclude) {
+    public static Entity colliding(Rect r) {
 
         for (int i = 0; i < entities.size(); i++) {
             Rect rect = entities.get(i).rect;
             if (rect.x == r.x && rect.y == r.y) {
                 continue;
-            }
-            
-            if (exclude != null) {
-                if (exclude.contains(entities.get(i))) {
-                    continue;
-                }
             }
 
             if (Physics.rectrect(rect, r)) {

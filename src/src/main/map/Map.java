@@ -1,6 +1,6 @@
 package main.map;
 
-import main.entities.map.Wall;
+import main.entities.Wall;
 import main.map.tiles.Tile;
 
 import java.awt.image.BufferedImage;

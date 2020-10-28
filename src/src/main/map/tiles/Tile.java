@@ -26,19 +26,19 @@ public class Tile extends Entity {
     }
 
     public void draw(Graphics2D g) {
-        if(this.rotation != 0 ) {
+        if(rotation != 0 ) {
             AffineTransform t = g.getTransform();
 
-            g.translate((int)this.rect.x + Constants.TILE_SCALE/2, (int)this.rect.y + Constants.TILE_SCALE/2);
-            g.rotate(this.rotation * Math.PI / 2);
+            g.translate((int)rect.x + Constants.TILE_SCALE/2, (int)rect.y + Constants.TILE_SCALE/2);
+            g.rotate(rotation * Math.PI / 2);
 
-            Sprite spr = Sprites.get(this.type.toString().toLowerCase() + this.variation);
+            Sprite spr = Sprites.get(type.toString().toLowerCase() + variation);
             g.drawImage(spr.img, Math.round(-spr.width/2), Math.round(-spr.height/2), null);
 
             g.setTransform(t);
         } else {
             
-            g.drawImage(Sprites.get(this.type.toString().toLowerCase() + this.variation).img, (int)this.rect.x, (int)this.rect.y, null);
+            g.drawImage(Sprites.get(type.toString().toLowerCase() + variation).img, (int)rect.x, (int)rect.y, null);
         }
     }
 }
