@@ -2,6 +2,8 @@ package main.entities.map;
 
 import java.awt.Color;
 
+import engine.GameJava;
+import engine.Utils;
 import engine.drawing.Draw;
 import main.entities.Entity;
 
@@ -13,7 +15,9 @@ public class Wall extends Entity {
 
     @Override
     public void draw() {
-        Draw.setColor(Color.WHITE);
-        Draw.rectOutline(this.rect);
+        if(Utils.debugMode) {
+            Draw.setColor(Color.WHITE);
+            Draw.rectOutline(this.rect);
+        }
     }
 }

@@ -4,7 +4,7 @@ import main.entities.Entity;
 
 public class Object extends Entity {
     enum objectTypes {
-        ENTRANCE, SPAWNER, DOOR
+        ENTRANCE, SPAWNER, DOOR, DESK
     }
 
     objectTypes type;

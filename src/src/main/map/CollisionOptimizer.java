@@ -14,12 +14,11 @@ public class CollisionOptimizer {
         int h = tiles.length-1;
         int w = tiles[0].length-1;
 
-
         // array of booleans for if there is a wall tile
-        boolean[][] wallTiles = new boolean[h][w];
+        boolean[][] wallTiles = new boolean[h+1][w+1];
         
         // array of booleans for if a tile has gotten a collision made for it
-        boolean[][] hasCollision = new boolean[h][w];
+        boolean[][] hasCollision = new boolean[h+1][w+1];
     
         // fill arrays
         for (int y = 0; y < h; y++) {
