@@ -21,7 +21,6 @@ import main.map.Map;
 
 import java.awt.Color;
 
-
 public class Main extends GameJava {
 
     enum State {
@@ -30,6 +29,8 @@ public class Main extends GameJava {
 
     State state = State.TITLE;
 
+    public static boolean showHitboxes = false;
+
     public static void main(String[] args) {
         new Main();
     }
@@ -37,19 +38,23 @@ public class Main extends GameJava {
     public Main() {
         super(800, 600, 60, 60);
 
-        LoadMap.loadMap(baseDirectory + directoryChar + "levels" + directoryChar + "first.txt");
-        Camera.centerOn(1000,1000);
-
         Entity.entities.add(new Player(1400, 184, 12, 12));
         Entity.entities.add(new Moveable(1400, 200, 16, 16));
         Entity.entities.add(new Moveable(1400, 220, 16, 16));
         Entity.entities.add(new Moveable(1400, 250, 16, 16));
+
+        LoadMap.loadMap(baseDirectory + directoryChar + "levels" + directoryChar + "first.txt");
+        Camera.centerOn(1000, 1000);
 
         LoopManager.startLoops(this);
     }
 
     @Override
     public void update() {
+        Utils.putInDebugMenu("m - toggle hitboxes", "on:" + showHitboxes);
+        if (Input.keyClick(KeyCodes.M)) {
+            showHitboxes = (showHitboxes ? false : true);
+        }
         switch (state) {
             case TITLE:
                 break;
@@ -60,7 +65,7 @@ public class Main extends GameJava {
             case PLAYING:
                 break;
         }
-        for(int i=0;i<Entity.entities.size();i++) {
+        for (int i = 0; i < Entity.entities.size(); i++) {
             Entity.entities.get(i).update();
         }
     }
@@ -84,13 +89,13 @@ public class Main extends GameJava {
         int w = Map.img.getWidth();
         int h = Map.img.getHeight();
         // Draw.image(Map.img, w/2, h/2, w, h);
-        Draw.image("b", w/2, h/2);
-        
-        for(int i=0;i<Entity.entities.size();i++) {
+        // Draw.image("b", w/2, h/2);
+
+        for (int i = 0; i < Entity.entities.size(); i++) {
             Entity.entities.get(i).draw();
         }
-        
-        Draw.image("a", w/2, h/2);
+
+        // Draw.image("a", w/2, h/2);
     }
 
     @Override

@@ -13,6 +13,10 @@ public class Entity {
     public Rect rect;
     public boolean moveable = false;
 
+    public double friction;
+    public double velX;
+    public double velY;
+
     public Entity(double x, double y, int w, int h) {
         this.rect = new Rect(x, y, w, h);
     }
@@ -26,8 +30,15 @@ public class Entity {
     public void move() {
     }
 
+    public int roundVelocity(double vel) {
+        return 0;
+    }
+
+    public void handleCollision() {
+
+    }
+
     public void applyForce(double xVel, double yVel) {
-        return null;
     }
 
     public static Entity colliding(Rect r) {

@@ -6,7 +6,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-
 import engine.Utils;
 import engine.drawing.Draw;
 import engine.physics.Physics;
@@ -17,27 +16,22 @@ import main.Main;
 
 public class Moveable extends Entity {
 
-    public double friction;
     public Color color = new Color(Utils.rand(0, 150), Utils.rand(0, 150), Utils.rand(0, 150));
-
-    public double velX;
-    public double velY;
-    public static int level = 0;
-    public static ArrayList<Entity> checked = new ArrayList<Entity>();
 
     public Moveable(double x, double y, int w, int h) {
         super(x, y, w, h);
 
-        friction = 0.5;
+        friction = 0.25;
         moveable = true;
-    } 
+    }
 
     public int roundVelocity(double vel) {
-        int inverse = (int)Math.round(1.0/vel);
-        if(vel == 0  || inverse == 0) {
+        double absolute = Math.abs(vel);
+        int inverse = (int) Math.round(1.0 / absolute);
+        if (vel == 0 || (inverse == 0 && absolute < 1.0)) {
             return 0;
         }
-        return (int)(vel < 1.0 ? (Main.updateCount%inverse == 0 ? 1 * Math.signum(vel) : 0) : vel);
+        return (int) (absolute < 1.0 ? (Main.updateCount % inverse == 0 ? 1 * Math.signum(vel) : 0) : vel);
     }
 
     @Override
@@ -47,54 +41,50 @@ public class Moveable extends Entity {
 
     @Override
     public void move() {
-        rect.x += roundVelocity(velX);
-        rect.y += roundVelocity(velY);
-
-        Entity e = Entity.colliding(rect);
-        if(e != null) {
-            Rect.preventIntersection(rect, e.rect);
+        int moveX = roundVelocity(velX);
+        rect.x += moveX;
+        if (moveX != 0) {
+            handleCollision();
         }
 
-        velX *= friction;
-        velY *= friction;
+        int moveY = roundVelocity(velY);
+        rect.y += moveY;
+        if (moveY != 0) {
+            handleCollision();
+        }
+
+        velX = Utils.friction(velX, friction);
+        velY = Utils.friction(velY, friction);
     }
 
     @Override
-    public void applyForce(double xVel, double yVel) {
-        if (level == 0) {
-            checked = new ArrayList<Entity>();
-        }
-        level++;
-        checked.add(this);
-
-        double xMove = roundVelocity(xVel * Constants.FORCE_TRANSFER);
-        double yMove = roundVelocity(yVel * Constants.FORCE_TRANSFER);
-        rect.x += xMove;
-        rect.y += yMove;
-
+    public void handleCollision() {
+        ArrayList<Integer> indexes = new ArrayList<Integer>();
         for (int i = 0; i < entities.size(); i++) {
             Rect r = entities.get(i).rect;
             if (rect.x == r.x && rect.y == r.y) {
                 continue;
             }
 
-            if (checked.contains(entities.get(i))) {
-                continue;
-            }
-
             if (Physics.rectrect(rect, r)) {
-                
-                Entity col =  entities.get(i);
-                if (col.moveable) {
-                    col.applyForce(xMove, yMove);
-                    Rect.preventIntersection(rect, col.rect);
-                } else {
-                    Rect.preventIntersection(rect, col.rect);
-                }
+                indexes.add(i);
             }
         }
 
-        level--;
+        double size = indexes.size();
+        for (int i = 0; i < size; i++) {
+            Entity e = entities.get(indexes.get(i));
+            e.applyForce(velX / size, velY / size);
+            Rect.preventIntersection(rect, e.rect);
+        }
+    }
+
+    @Override
+    public void applyForce(double velX, double velY) {
+        if (this.moveable) {
+            this.velX = velX * Constants.FORCE_TRANSFER;
+            this.velY = velY * Constants.FORCE_TRANSFER;
+        }
     }
 
     @Override
