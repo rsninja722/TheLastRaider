@@ -41,6 +41,7 @@ public class Entity {
     public void applyForce(double xVel, double yVel) {
     }
 
+    // returns an entity a rectangle is colliding with
     public static Entity colliding(Rect r) {
 
         for (int i = 0; i < entities.size(); i++) {

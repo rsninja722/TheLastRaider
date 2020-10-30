@@ -26,7 +26,6 @@ public class Player extends Moveable {
 
     boolean recordingAttack = false;
     Point lastMousePos;
-    double attackAngle;
     ArrayList<Double> angles;
 
     int attackTime;
@@ -58,11 +57,13 @@ public class Player extends Moveable {
             moveX = Constants.PLAYER_SPEED;
         }
 
+        // make diagonal same speed as sideways
         if (moveX != 0 && moveY != 0) {
-            moveX /= 1.3;
-            moveY /= 1.3;
+            moveX /= 1.4;
+            moveY /= 1.4;
         }
 
+        // handle dash move
         if (dashCooldown > 0) {
             dashCooldown--;
         }
@@ -72,7 +73,7 @@ public class Player extends Moveable {
             velY += Math.signum(moveY) * Constants.PLAYER_DASH;
         }
 
-        // move
+        // move if there isn't already a high velocity
         if (Math.abs(velX) < Constants.PLAYER_SPEED) {
             velX = moveX;
         }
@@ -92,27 +93,39 @@ public class Player extends Moveable {
             angle = Utils.turnTo(angle, Utils.pointTo(rect.x, rect.y, rect.x + moveX, rect.y + moveY), 0.2);
         }
 
+        // start tracking attack
         if (Input.mouseClick(0)) {
             recordingAttack = true;
             angles = new ArrayList<Double>();
         }
+        // track points 
         if (recordingAttack) {
+            // stop tracking
             if (!Input.mouseDown(0)) {
                 recordingAttack = false;
+                lastMousePos = null;
             }
 
+            // first point
             if (lastMousePos == null) {
                 lastMousePos = new Point(Input.mousePos.x, Input.mousePos.y);
-                attackAngle = Utils.pointTo(rect.x, rect.y, lastMousePos.x, lastMousePos.y);
+            // add points
             } else {
-                angles.add(Utils.pointTo(lastMousePos, Input.mousePos));
+                double ang = Utils.pointTo(lastMousePos, Input.mousePos);
+                if (ang < 0) {
+                    ang = Math.PI * 2 + ang;
+                }
+                angles.add(ang);
                 lastMousePos = new Point(Input.mousePos.x, Input.mousePos.y);
+                
+                // start looking for attacks after enough points
                 if (angles.size() > 9) {
                     analyzeAttack();
                 }
             }
         }
 
+        // attack animation
         if (attackTime > 0) {
             attackTime--;
         }
@@ -129,51 +142,66 @@ public class Player extends Moveable {
         Utils.putInDebugMenu("angle", angle);
     }
 
+    // determines if a set of points can represent a jab, swipe, or spin 
     void analyzeAttack() {
         double size = (double) angles.size();
         double[] samples = new double[5];
         double average = 0;
         double differenceTotal = 0;
 
+        // sample 5 points 
         if (size > 4) {
             for (double i = 0; i < 5; i++) {
                 samples[(int) i] = angles.get((int) Math.floor(Utils.mapRange(i, 0, 4, 0, size - 1)));
                 average += samples[(int) i];
             }
         }
+        // find average angle of all points
         average /= 5;
 
-        for (int i = 0; i < 5; i++) {
-            differenceTotal += Math.abs(average - samples[i]);
+        // find total change in angle across all samples
+        for (int i = 1; i < 5; i++) {
+            differenceTotal += angleDiff(samples[i-1], samples[i]);
         }
 
-        if (differenceTotal > 5.0) {
-            attack = Attacks.SPIN;
-            attackTime = 20;
-        } else {
-            double diff = Math.abs(angle - average);
-            if (diff > 1.0 && diff < 4.0) {
-                attack = Attacks.SWIPE;
-                attackTime = 15;
-            }
-            if (diff < 1.0) {
-                attack = Attacks.JAB;
-                attackTime = 10;
+        if(attackTime == 0) {
+            // spin if the angle changed a lot
+            if (differenceTotal > 4.5) {
+                attack = Attacks.SPIN;
+                attackTime = 20;
+                recordingAttack = false;
+                lastMousePos = null;
+            } else {
+                // find difference between player angle and attack angle average
+                double diff = angleDiff(angle, average);
+                // if the angle is close to perpendicular, swipe
+                if (diff > 1.0 && diff < 2.0) {
+                    attack = Attacks.SWIPE;
+                    attackTime = 15;
+                }
+                // if angle is close to player angle, jab
+                if (diff < 0.75 || diff > 2.25) {
+                    attack = Attacks.JAB;
+                    attackTime = 10;
+                }
             }
         }
+    }
 
-        if (attack != null) {
-            recordingAttack = false;
-            lastMousePos = null;
-        }
+    // calculates difference between angles accounting for when angles are locationally close and not numarically 
+    double angleDiff(double a1, double a2) {
+        double diff = Math.abs(a1 - a2);
+        return (diff > Math.PI ? Math.PI*2.0-diff : diff);
     }
 
     @Override
     public void draw() {
+        // legs
         int walk = (int) walkCycle;
         walk = walk > 3 ? 6 - walk : walk;
         Draw.image("playerLegs" + walk, (int) rect.x, (int) rect.y, angle, 1.0);
 
+        // attacks
         if (attackTime > 0) {
             double rotOff;
             switch (attack) {
@@ -205,6 +233,7 @@ public class Player extends Moveable {
                     Draw.image("playerHead", (int) rect.x, (int) rect.y, angle, 1.0);
                     break;
             }
+        // unanimated
         } else {
             drawOff("playerShield", rect.x, rect.y, angle, 5, 3, angle);
             drawOff("playerArmLeft", rect.x, rect.y, angle, 5, 1, angle);
@@ -216,6 +245,7 @@ public class Player extends Moveable {
 
     }
 
+    // draw with an angled offset
     static void drawOff(String name, double x, double y, double offAng, int offX, int offY, double angle) {
         double sideX = Math.cos(offAng - Math.PI / 2.0) * offX;
         double sideY = Math.sin(offAng - Math.PI / 2.0) * offX;

@@ -89,7 +89,7 @@ public class Main extends GameJava {
         int w = Map.img.getWidth();
         int h = Map.img.getHeight();
         // Draw.image(Map.img, w/2, h/2, w, h);
-        // Draw.image("b", w/2, h/2);
+        // Draw.image("b", w/2, h/2); 
 
         for (int i = 0; i < Entity.entities.size(); i++) {
             Entity.entities.get(i).draw();

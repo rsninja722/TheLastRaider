@@ -25,6 +25,7 @@ public class Moveable extends Entity {
         moveable = true;
     }
 
+    // for velocities lower than 1, returns 1 periodically at a rate depending on how small the velocity is
     public int roundVelocity(double vel) {
         double absolute = Math.abs(vel);
         int inverse = (int) Math.round(1.0 / absolute);
@@ -41,24 +42,28 @@ public class Moveable extends Entity {
 
     @Override
     public void move() {
+        // x
         int moveX = roundVelocity(velX);
         rect.x += moveX;
         if (moveX != 0) {
             handleCollision();
         }
 
+        // y
         int moveY = roundVelocity(velY);
         rect.y += moveY;
         if (moveY != 0) {
             handleCollision();
         }
 
+        // friction
         velX = Utils.friction(velX, friction);
         velY = Utils.friction(velY, friction);
     }
 
     @Override
     public void handleCollision() {
+        // find all collisions
         ArrayList<Integer> indexes = new ArrayList<Integer>();
         for (int i = 0; i < entities.size(); i++) {
             Rect r = entities.get(i).rect;
@@ -71,6 +76,7 @@ public class Moveable extends Entity {
             }
         }
 
+        // apply a force to and prevent intersection with all entities collided with
         double size = indexes.size();
         for (int i = 0; i < size; i++) {
             Entity e = entities.get(indexes.get(i));

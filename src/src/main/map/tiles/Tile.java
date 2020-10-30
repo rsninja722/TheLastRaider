@@ -26,6 +26,7 @@ public class Tile extends Entity {
     }
 
     public void draw(Graphics2D g) {
+        // draw rotated
         if(rotation != 0 ) {
             AffineTransform t = g.getTransform();
 
@@ -36,8 +37,8 @@ public class Tile extends Entity {
             g.drawImage(spr.img, Math.round(-spr.width/2), Math.round(-spr.height/2), null);
 
             g.setTransform(t);
+        // normal draw
         } else {
-            
             g.drawImage(Sprites.get(type.toString().toLowerCase() + variation).img, (int)rect.x, (int)rect.y, null);
         }
     }

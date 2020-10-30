@@ -8,6 +8,7 @@ import main.map.tiles.Tile;
 import main.map.tiles.Tile.tileTypes;
 
 public class CollisionOptimizer {
+    // takes 2d array of squares and creates larger collision boxes so there is less to check each frame
     public static Wall[] createCollisions(Tile[][] tiles) {
         ArrayList<Wall> wallsList = new ArrayList<Wall>();
 
