@@ -43,7 +43,7 @@ public class Main extends GameJava {
         Entity.entities.add(new Moveable(1400, 220, 16, 16));
         Entity.entities.add(new Moveable(1400, 250, 16, 16));
 
-        LoadMap.loadMap(baseDirectory + directoryChar + "levels" + directoryChar + "first.txt");
+        LoadMap.loadMap(baseDirectory + directoryChar + "levels" + directoryChar + "second.txt");
         Camera.centerOn(1000, 1000);
 
         LoopManager.startLoops(this);
@@ -88,7 +88,7 @@ public class Main extends GameJava {
 
         int w = Map.img.getWidth();
         int h = Map.img.getHeight();
-        // Draw.image(Map.img, w/2, h/2, w, h);
+        Draw.image(Map.img, w/2, h/2, w, h);
         // Draw.image("b", w/2, h/2); 
 
         for (int i = 0; i < Entity.entities.size(); i++) {

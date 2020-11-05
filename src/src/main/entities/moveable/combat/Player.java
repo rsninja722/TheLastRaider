@@ -10,6 +10,7 @@ import engine.drawing.Camera;
 import engine.drawing.Draw;
 import engine.physics.Point;
 import main.Constants;
+import main.entities.Entity;
 import main.entities.moveable.Moveable;
 
 public class Player extends Moveable {
@@ -133,6 +134,11 @@ public class Player extends Moveable {
         // move camera
         Camera.zoom = 3;
         Camera.centerOn((int) rect.x, (int) rect.y);
+
+
+        if (Input.mouseClick(0)) {
+            Entity.entities.add(new Enemy(Input.mousePos.x, Input.mousePos.y, 20, 20));
+        }
 
         // debug
         Utils.putInDebugMenu("x", rect.x);
