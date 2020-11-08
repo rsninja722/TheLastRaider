@@ -1,6 +1,7 @@
 package main.map.tiles;
 
 import main.Constants;
+import main.map.Map;
 
 public class TileParser {
 
@@ -9,6 +10,8 @@ public class TileParser {
 
         int w = Integer.parseInt(tiles[0]);
         int h = Integer.parseInt(tiles[1]);
+        Map.w = w;
+        Map.h = h;
 
         Tile[][] tileMatrix = new Tile[h][w];
 

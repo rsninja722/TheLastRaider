@@ -1,6 +1,7 @@
 package main.ui;
 
 import java.awt.Color;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 
 import engine.drawing.Draw;
@@ -40,9 +41,11 @@ public class Component {
     }
 
     public void renderThisAndChildren() {
-        if(this.show) {
-            
-
+        if(show) {
+            draw();
+            for(int i =0;i<children.size();i++) {
+                renderThisAndChildren();
+            }
         }
     }
 

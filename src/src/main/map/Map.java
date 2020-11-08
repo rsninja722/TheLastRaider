@@ -6,6 +6,9 @@ import main.map.tiles.Tile;
 import java.awt.image.BufferedImage;
 
 public class Map {
+    public static int w;
+    public static int h;
+
     public static Tile[][] tiles;
     public static Object[] objects;
 

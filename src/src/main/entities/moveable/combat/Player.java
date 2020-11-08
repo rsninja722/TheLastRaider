@@ -10,8 +10,13 @@ import engine.drawing.Camera;
 import engine.drawing.Draw;
 import engine.physics.Point;
 import main.Constants;
+import main.Main;
+import main.util.AStar;
 import main.entities.Entity;
 import main.entities.moveable.Moveable;
+import main.entities.moveable.combat.enemies.EnemyHeavy;
+import main.entities.moveable.combat.enemies.EnemyLight;
+import main.entities.moveable.combat.enemies.EnemyNormal;
 
 public class Player extends Moveable {
 
@@ -110,7 +115,7 @@ public class Player extends Moveable {
             // first point
             if (lastMousePos == null) {
                 lastMousePos = new Point(Input.mousePos.x, Input.mousePos.y);
-            // add points
+                // add points
             } else {
                 double ang = Utils.pointTo(lastMousePos, Input.mousePos);
                 if (ang < 0) {
@@ -118,7 +123,7 @@ public class Player extends Moveable {
                 }
                 angles.add(ang);
                 lastMousePos = new Point(Input.mousePos.x, Input.mousePos.y);
-                
+
                 // start looking for attacks after enough points
                 if (angles.size() > 9) {
                     analyzeAttack();
@@ -135,9 +140,14 @@ public class Player extends Moveable {
         Camera.zoom = 3;
         Camera.centerOn((int) rect.x, (int) rect.y);
 
-
         if (Input.mouseClick(0)) {
-            Entity.entities.add(new Enemy(Input.mousePos.x, Input.mousePos.y, 20, 20));
+            Entity.entities.add(new EnemyHeavy(Input.mousePos.x, Input.mousePos.y, 14, 14));
+        }
+        if (Input.mouseClick(1)) {
+            Entity.entities.add(new EnemyNormal(Input.mousePos.x, Input.mousePos.y, 14, 14));
+        }
+        if (Input.mouseClick(2)) {
+            Entity.entities.add(new EnemyLight(Input.mousePos.x, Input.mousePos.y, 14, 14));
         }
 
         // debug
@@ -167,10 +177,10 @@ public class Player extends Moveable {
 
         // find total change in angle across all samples
         for (int i = 1; i < 5; i++) {
-            differenceTotal += angleDiff(samples[i-1], samples[i]);
+            differenceTotal += angleDiff(samples[i - 1], samples[i]);
         }
 
-        if(attackTime == 0) {
+        if (attackTime == 0) {
             // spin if the angle changed a lot
             if (differenceTotal > 4.5) {
                 attack = Attacks.SPIN;
@@ -197,7 +207,7 @@ public class Player extends Moveable {
     // calculates difference between angles accounting for when angles are locationally close and not numarically 
     double angleDiff(double a1, double a2) {
         double diff = Math.abs(a1 - a2);
-        return (diff > Math.PI ? Math.PI*2.0-diff : diff);
+        return (diff > Math.PI ? Math.PI * 2.0 - diff : diff);
     }
 
     @Override
@@ -239,7 +249,7 @@ public class Player extends Moveable {
                     Draw.image("playerHead", (int) rect.x, (int) rect.y, angle, 1.0);
                     break;
             }
-        // unanimated
+            // unanimated
         } else {
             drawOff("playerShield", rect.x, rect.y, angle, 5, 3, angle);
             drawOff("playerArmLeft", rect.x, rect.y, angle, 5, 1, angle);
