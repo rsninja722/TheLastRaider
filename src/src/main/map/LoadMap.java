@@ -38,6 +38,12 @@ public class LoadMap {
             Map.objects = ObjectParser.loadObjectsFromString(objectData);
 
             RenderMap.render();
+
+            for(int j=0;j<Entity.entities.size();j++) {
+                if(Entity.entities.get(j).moveable) {
+                    Entity.entities.get(j).handleCollision();
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

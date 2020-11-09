@@ -31,8 +31,8 @@ public class Node {
     }
 
     public void constructPath() {
-        AStar.path.add(0, new Point(x*16 + 8, y*16 + 8));
         if (parent != null) {
+            AStar.path.add(0, new Point(x*16 + 8, y*16 + 8));
             parent.constructPath();
         }
     }

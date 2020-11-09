@@ -1,7 +1,7 @@
 package main.entities.moveable.map;
 
+import engine.Utils;
 import engine.drawing.Draw;
-import main.Main;
 import main.entities.moveable.Moveable;
 
 import java.awt.Color;
@@ -36,13 +36,30 @@ public class Desk extends Moveable {
                 }
                 break;
         }
+
+        setHP(30);
+        damageable = true; 
+    }
+
+    @Override
+    public boolean update() {
+        move();
+        if(hp < 1) {
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void draw() {
-        Draw.image("desk" + variation, (int) rect.x, (int) rect.y, rotation * Math.PI / 2.0, 1.0);
-        if (Main.showHitboxes) {
-            Draw.setColor(Color.WHITE);
+        if(this.hp < 16) {
+            Draw.image("desk" + variation + "damage", (int) rect.x, (int) rect.y, rotation * Math.PI / 2.0, 1.0);   
+        } else {
+            Draw.image("desk" + variation, (int) rect.x, (int) rect.y, rotation * Math.PI / 2.0, 1.0);
+        }
+
+        if(Utils.debugMode) {
+            Draw.setColor(Color.GREEN);
             Draw.rectOutline(rect);
         }
     }

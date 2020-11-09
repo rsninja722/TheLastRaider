@@ -2,11 +2,8 @@ package main.entities;
 
 import java.awt.Color;
 
-import engine.GameJava;
 import engine.Utils;
 import engine.drawing.Draw;
-import main.Main;
-import main.entities.Entity;
 
 public class Wall extends Entity {
 
@@ -16,8 +13,8 @@ public class Wall extends Entity {
 
     @Override
     public void draw() {
-        if(Main.showHitboxes) {
-            Draw.setColor(Color.WHITE);
+        if(Utils.debugMode) {
+            Draw.setColor(Color.LIGHT_GRAY);
             Draw.rectOutline(rect);
         }
     }

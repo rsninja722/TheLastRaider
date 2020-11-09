@@ -1,6 +1,9 @@
 package main.map.objects;
 
 import main.entities.Entity;
+import main.entities.moveable.combat.enemies.EnemyHeavy;
+import main.entities.moveable.combat.enemies.EnemyLight;
+import main.entities.moveable.combat.enemies.EnemyNormal;
 import main.entities.moveable.map.Desk;
 
 public class Object {
@@ -25,6 +28,17 @@ public class Object {
             case ENTRANCE:
                 break;
             case SPAWNER:
+                switch(data) {
+                    case "0":
+                        Entity.entities.add(new EnemyLight(x, y, 10, 10));
+                        break;
+                    case "1":
+                        Entity.entities.add(new EnemyNormal(x, y, 14, 14));
+                        break;
+                    case "2":
+                        Entity.entities.add(new EnemyHeavy(x, y, 20, 20));
+                        break;
+                }
                 break;
             case DOOR:
                 break;

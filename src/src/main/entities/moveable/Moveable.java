@@ -18,10 +18,14 @@ public class Moveable extends Entity {
 
     public Color color = new Color(Utils.rand(0, 150), Utils.rand(0, 150), Utils.rand(0, 150));
 
+    public double forceTransfer = 0.75;
+    public double friction = 0.1;
+    public double velX;
+    public double velY;
+
     public Moveable(double x, double y, int w, int h) {
         super(x, y, w, h);
 
-        friction = 0.25;
         moveable = true;
     }
 
@@ -36,8 +40,9 @@ public class Moveable extends Entity {
     }
 
     @Override
-    public void update() {
+    public boolean update() {
         move();
+        return false;
     }
 
     @Override
@@ -88,8 +93,8 @@ public class Moveable extends Entity {
     @Override
     public void applyForce(double velX, double velY) {
         if (this.moveable) {
-            this.velX = velX * Constants.FORCE_TRANSFER;
-            this.velY = velY * Constants.FORCE_TRANSFER;
+            this.velX = velX * forceTransfer;
+            this.velY = velY * forceTransfer;
         }
     }
 

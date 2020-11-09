@@ -6,11 +6,13 @@ public class EnemyNormal extends Enemy {
 
     public EnemyNormal(double x, double y, int w, int h) {
         super(x, y, w, h);
-        
-        range = 16;
+
+        range = 20;
         walkCountInterval = 15;
-        speed = 1.1;
+        speed = 1.0;
+        forceTransfer = 0.6;
         name = "normal";
+        setHP(20);
     }
-    
+
 }
