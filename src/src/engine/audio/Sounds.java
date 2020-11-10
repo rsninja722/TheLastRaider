@@ -12,7 +12,7 @@ import engine.drawing.Sprite;
 public class Sounds {
 	public static HashMap<String, Sound> soundList = new HashMap<String, Sound>();
 	
-	
+    static float globalVolumeLevel = 1.0f;
 
     // absolute path of the images folder
     private static String soundsDirectory;
@@ -95,13 +95,21 @@ public class Sounds {
 	 * @param soundName
 	 * @param level number between 0.0 and 1.0
 	 */
-	public static void ajustGain(String soundName, float level) {
+	public static void adjustGain(String soundName, float level) {
 		Sound s = soundList.get(soundName);
         if (s == null) {
             System.out.println("error: " + soundName + " not found");
         }
         level = Math.max(Math.min(level, 1.0f), 0.0f);
         
-        soundList.get(soundName).ajustGain(level);
+        soundList.get(soundName).adjustGain(level);
+    }
+    
+
+    public static void globalVolume(float level) {
+		soundList.values().forEach( e -> {
+            e.adjustGainGlobal(level);
+        });
+        globalVolumeLevel = level;
 	}
 }

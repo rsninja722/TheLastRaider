@@ -3,6 +3,7 @@ package main.entities.moveable.combat;
 import java.util.ArrayList;
 
 import engine.Utils;
+import engine.audio.Sounds;
 import engine.drawing.Draw;
 import engine.physics.Physics;
 import engine.physics.Point;
@@ -13,15 +14,16 @@ import java.awt.Color;
 
 public class Enemy extends Moveable {
 
-    int walkCycle = 0;
+    protected int walkCycle = 0;
     int walkCount = 0;
-    boolean moving = false;
+    protected boolean moving = false;
     protected int walkCountInterval = 15;
     protected int range = 16;
     protected double speed = 0.2;
-    protected String name = "normal";
 
-    double angle = 0;
+    protected int attackTime = 0;
+
+    protected double angle = 0;
 
     ArrayList<Point> path = new ArrayList<Point>();
 
@@ -34,15 +36,16 @@ public class Enemy extends Moveable {
     @Override
     public boolean update() {
         if(hp < 1) {
+            Sounds.play("enemydeath" + Utils.rand(0, 4));
             return true;
         }
 
         double playerDist = Physics.dist(rect.x, rect.y, Main.player.rect.x, Main.player.rect.y);
-        if(Main.updateCount % Math.ceil(playerDist/3) == 0 && playerDist < 300) {
+        if(Main.updateCount % Math.ceil(playerDist/3) == 0 && playerDist < 200) {
             path = AStar.findPath((int) rect.x, (int) rect.y,(int) Main.player.rect.x, (int) Main.player.rect.y);
         }
         
-        if(playerDist > range) {
+        if(playerDist > range && attackTime == 0) {
             walkCount++;
             if(walkCount % walkCountInterval == 0) {
                 walkCycle++;
@@ -63,7 +66,9 @@ public class Enemy extends Moveable {
             }
         } else {
             moving = false;
-            angle = Utils.pointTo(rect.x, rect.y, Main.player.rect.x, Main.player.rect.y);
+            if(attackTime == 0) {
+                angle = Utils.pointTo(rect.x, rect.y, Main.player.rect.x, Main.player.rect.y);
+            }
             attack();
         }
         move();
@@ -79,13 +84,7 @@ public class Enemy extends Moveable {
     public void attack() {
     }
 
-    @Override
-    public void draw() {
-        if(moving) {
-            Draw.image(name+"Walk"+walkCycle, (int)rect.x, (int)rect.y, angle, 1);
-        } else {
-            Draw.image(name, (int)rect.x, (int)rect.y, angle, 1);
-        }
+    public void baseDraw() {
         Draw.setColor(new Color(80, 31, 31, 200));
         Draw.rect((int)rect.x, (int)rect.y + 12, 16, 2);
 

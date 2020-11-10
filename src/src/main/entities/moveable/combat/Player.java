@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import engine.Input;
 import engine.KeyCodes;
 import engine.Utils;
+import engine.audio.Sounds;
 import engine.drawing.Camera;
 import engine.drawing.Draw;
 import engine.physics.Point;
@@ -42,27 +43,27 @@ public class Player extends Moveable {
         cameraTarget = new Point(Camera.x, Camera.y);
 
         this.friction = Constants.PLAYER_FRICTION;
-        hp = 20;
+        setHP(20);
     }
 
     @Override
     public boolean update() {
 
-        if(Utils.debugMode) {
-            if(Input.keyClick(KeyCodes.V)) {
+        if (Utils.debugMode) {
+            if (Input.keyClick(KeyCodes.V)) {
                 noClip = !noClip;
             }
 
-            if(Input.keyClick(KeyCodes.NUM0)) {
+            if (Input.keyClick(KeyCodes.NUM0)) {
                 Main.loadLevel(0);
             }
-            if(Input.keyClick(KeyCodes.NUM1)) {
+            if (Input.keyClick(KeyCodes.NUM1)) {
                 Main.loadLevel(1);
             }
-            if(Input.keyClick(KeyCodes.NUM2)) {
+            if (Input.keyClick(KeyCodes.NUM2)) {
                 Main.loadLevel(2);
             }
-            if(Input.keyClick(KeyCodes.NUM3)) {
+            if (Input.keyClick(KeyCodes.NUM3)) {
                 Main.loadLevel(3);
             }
         }
@@ -70,44 +71,47 @@ public class Player extends Moveable {
         // find speed
         double moveX = 0;
         double moveY = 0;
-        if (Input.keyDown(KeyCodes.W)) {
-            moveY = -Constants.PLAYER_SPEED;
-        }
-        if (Input.keyDown(KeyCodes.A)) {
-            moveX = -Constants.PLAYER_SPEED;
-        }
-        if (Input.keyDown(KeyCodes.S)) {
-            moveY = Constants.PLAYER_SPEED;
-        }
-        if (Input.keyDown(KeyCodes.D)) {
-            moveX = Constants.PLAYER_SPEED;
+        if(attackTime == 0) {
+            if (Input.keyDown(KeyCodes.W)) {
+                moveY = -Constants.PLAYER_SPEED;
+            }
+            if (Input.keyDown(KeyCodes.A)) {
+                moveX = -Constants.PLAYER_SPEED;
+            }
+            if (Input.keyDown(KeyCodes.S)) {
+                moveY = Constants.PLAYER_SPEED;
+            }
+            if (Input.keyDown(KeyCodes.D)) {
+                moveX = Constants.PLAYER_SPEED;
+            }
+
+            // make diagonal same speed as sideways
+            if (moveX != 0 && moveY != 0) {
+                moveX /= 1.4;
+                moveY /= 1.4;
+            }
+
+            // handle dash move
+            if (dashCooldown > 0) {
+                dashCooldown--;
+            }
+            if (Input.keyClick(KeyCodes.SPACE) && dashCooldown == 0) {
+                dashCooldown = Constants.PLAYER_DASH_TIME;
+                velX += Math.signum(moveX) * Constants.PLAYER_DASH;
+                velY += Math.signum(moveY) * Constants.PLAYER_DASH;
+                Sounds.play("dash");
+            }
+
+            // move if there isn't already a high velocity
+            if (Math.abs(velX) < Constants.PLAYER_SPEED) {
+                velX = moveX;
+            }
+            if (Math.abs(velY) < Constants.PLAYER_SPEED) {
+                velY = moveY;
+            }
         }
 
-        // make diagonal same speed as sideways
-        if (moveX != 0 && moveY != 0) {
-            moveX /= 1.4;
-            moveY /= 1.4;
-        }
-
-        // handle dash move
-        if (dashCooldown > 0) {
-            dashCooldown--;
-        }
-        if (Input.keyClick(KeyCodes.SPACE) && dashCooldown == 0) {
-            dashCooldown = Constants.PLAYER_DASH_TIME;
-            velX += Math.signum(moveX) * Constants.PLAYER_DASH;
-            velY += Math.signum(moveY) * Constants.PLAYER_DASH;
-        }
-
-        // move if there isn't already a high velocity
-        if (Math.abs(velX) < Constants.PLAYER_SPEED) {
-            velX = moveX;
-        }
-        if (Math.abs(velY) < Constants.PLAYER_SPEED) {
-            velY = moveY;
-        }
-
-        if(noClip) {
+        if (noClip) {
             rect.x += moveX * 5.0;
             rect.y += moveY * 5.0;
         } else {
@@ -117,6 +121,9 @@ public class Player extends Moveable {
         // walk animation
         if (moveX != 0 || moveY != 0) {
             walkCycle += 0.25;
+            if(walkCycle == 3 || walkCycle == 6) {
+                Sounds.play("walk"+Utils.rand(0,2));
+            }
             if (walkCycle >= 6) {
                 walkCycle = 0;
             }
@@ -125,9 +132,9 @@ public class Player extends Moveable {
             walkAngle = Utils.turnTo(walkAngle, Utils.pointTo(rect.x, rect.y, rect.x + moveX, rect.y + moveY), 0.2);
         }
 
-        angle  = Utils.turnTo(angle, Utils.pointTo(rect.x, rect.y, Input.mousePos.x, Input.mousePos.y), 0.2);
+        angle = Utils.turnTo(angle, Utils.pointTo(rect.x, rect.y, Input.mousePos.x, Input.mousePos.y), 0.2);
 
-        if(Options.useMotionControl) {
+        if (Options.useMotionControl) {
             // start tracking attack
             if (Input.mouseClick(0)) {
                 recordingAttack = true;
@@ -160,44 +167,55 @@ public class Player extends Moveable {
                 }
             }
         } else {
-            if(attackTime == 0) {
-                if(Input.mouseClick(0)) {
+            if (attackTime == 0) {
+                if (Input.mouseClick(0)) {
                     attack = Attacks.SWIPE;
-                    attackTime = 15;
+                    attackTime = 20;
                 }
-                if(Input.mouseClick(2)) {
+                if (Input.mouseClick(2)) {
                     attack = Attacks.JAB;
                     attackTime = 10;
                 }
-                if(Input.mouseDown(0) && Input.mouseDown(2)) {
+                if (Input.mouseDown(0) && Input.mouseDown(2)) {
                     attack = Attacks.SPIN;
-                    attackTime = 20;
+                    attackTime = 40;
                 }
             }
         }
-
 
         // attack 
         if (attackTime > 0) {
             attackTime--;
 
-            switch(attack) {
+            switch (attack) {
                 case JAB:
-                    if(attackTime == 7 || attackTime == 3) {
-                        double multi = 15 - attackTime;
-                        Damage.damages.add(new Damage(rect.x + Math.cos(angle) * multi + Math.cos(angle - Math.PI / 2.0) * -4,rect.y + Math.sin(angle) * multi + Math.sin(angle - Math.PI / 2.0) * -4, 4,4,5,false));
+                    if(attackTime == 8) {
+                        Sounds.play("swordjab");
+                    }
+                    if (attackTime == 7 || attackTime == 3) {
+                        double multi = 20 - attackTime;
+                        Damage.damages.add(new Damage(rect.x + Math.cos(angle) * multi + Math.cos(angle - Math.PI / 2.0) * -4, rect.y + Math.sin(angle) * multi + Math.sin(angle - Math.PI / 2.0) * -4, 4, 4, 2, false));
                     }
                     break;
                 case SWIPE:
-                    if(attackTime == 13 || attackTime == 8 || attackTime == 3) {
-                        double ang = angle + (7 - attackTime) / 10.0;
-                        Damage.damages.add(new Damage(rect.x + Math.cos(ang) * 8.0,rect.y + Math.sin(ang) * 8.0 , 4,4,5,false));
+                    if(attackTime == 13) {
+                        Sounds.play("swordswipe");
+                    }
+                    if (attackTime == 17 || attackTime == 13 || attackTime == 8) {
+                        double ang = angle + (13 - attackTime) / 10.0;
+                        Damage.damages.add( new Damage(rect.x + Math.cos(ang) * 12.0, rect.y + Math.sin(ang) * 12.0, 4, 4, 2, false));
                     }
                     break;
                 case SPIN:
-                    if(attackTime % 2 == 0) {
-                        double ang = angle +(20-attackTime) * 0.31415;
-                        Damage.damages.add(new Damage(rect.x + Math.cos(ang) * 8.0,rect.y + Math.sin(ang) * 8.0 , 4,4,5,false));
+                    if(attackTime == 28) {
+                        Sounds.play("swordswoosh");
+                    }
+                    if (attackTime % 2 == 0 && attackTime > 20) {
+                        double ang = angle + (40 - attackTime) * 0.31415;
+                        Damage.damages.add(new Damage(rect.x + Math.cos(ang) * 14.0, rect.y + Math.sin(ang) * 14.0, 4, 4, 2, false));
+                    }
+                    if(attackTime == 20) {
+                        Damage.damages.add(new Damage(rect.x + Math.cos(angle) * 14.0, rect.y + Math.sin(angle) * 14.0, 6, 6, 5, false));
                     }
                     break;
             }
@@ -281,7 +299,7 @@ public class Player extends Moveable {
             double rotOff;
             switch (attack) {
                 case SPIN:
-                    rotOff = Utils.mapRange(attackTime, 0, 20, Math.PI * 2.0, 0);
+                    rotOff =  attackTime > 20 ? Utils.mapRange(attackTime, 0, 20, Math.PI * 2.0, 0) : 0.0;
                     drawOff("playerShield", rect.x, rect.y, angle + rotOff, 5, 3, angle + rotOff);
                     drawOff("playerArmLeft", rect.x, rect.y, angle + rotOff, 5, 1, angle + rotOff);
                     drawOff("playerSword1", rect.x, rect.y, angle + rotOff, -5, 3, angle + rotOff);
@@ -314,11 +332,18 @@ public class Player extends Moveable {
             drawOff("playerArmLeft", rect.x, rect.y, angle, 5, 1, angle);
             drawOff("playerSword0", rect.x, rect.y, angle, -5, 3, angle);
             drawOff("playerArmRight", rect.x, rect.y, angle, -5, 1, angle);
-            Draw.image("playerBody", (int) rect.x, (int) rect.y, angle, 1.0);
+            Draw.image("playerBody", (int) rect.x, (int) rect.y, angle + ((walkCycle -3) / 10.0), 1.0);
             Draw.image("playerHead", (int) rect.x, (int) rect.y, angle, 1.0);
         }
 
-        if(Utils.debugMode) {
+        Draw.setColor(new Color(36, 60, 112, 200));
+        Draw.rect((int)rect.x, (int)rect.y + 12, 16, 2);
+
+        int size = (int)Utils.mapRange(hp, 0, maxHp, 0, 16);
+        Draw.setColor(new Color(43, 104, 237, 200));
+        Draw.rect((int)rect.x - (8-size/2), (int)rect.y + 12, size, 2);
+
+        if (Utils.debugMode) {
             Draw.setColor(Color.WHITE);
             Draw.rectOutline(rect);
         }

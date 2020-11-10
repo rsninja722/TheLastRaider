@@ -2,16 +2,22 @@ package main.entities;
 
 import java.util.ArrayList;
 
+import engine.Utils;
+import engine.drawing.Draw;
 import engine.physics.Physics;
 import engine.physics.Rect;
+import java.awt.Color;
 
 public class Entity {
 
-    public static ArrayList<Entity> entities = new ArrayList<Entity>();
+    public static ArrayList<ArrayList<Entity>> entitiesList = new ArrayList<ArrayList<Entity>>();
+
+    public static ArrayList<Entity> entities;
 
     public Rect rect;
     public boolean moveable = false;
     public boolean damageable = false;
+    public boolean neutral = false;
     public int hp;
     public int maxHp;
 
@@ -32,6 +38,10 @@ public class Entity {
     }
 
     public void draw() {
+        if(Utils.debugMode) {
+            Draw.setColor(Color.LIGHT_GRAY);
+            Draw.rectOutline(rect);
+        }
     }
 
     public void move() {

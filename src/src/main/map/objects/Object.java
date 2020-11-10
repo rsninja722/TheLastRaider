@@ -1,14 +1,18 @@
 package main.map.objects;
 
+import main.Main;
 import main.entities.Entity;
 import main.entities.moveable.combat.enemies.EnemyHeavy;
 import main.entities.moveable.combat.enemies.EnemyLight;
 import main.entities.moveable.combat.enemies.EnemyNormal;
 import main.entities.moveable.map.Desk;
+import main.entities.moveable.map.Door;
+import main.entities.moveable.map.Stairs;
+import main.map.Map;
 
 public class Object {
     enum objectTypes {
-        ENTRANCE, SPAWNER, DOOR, DESK
+        ENTRANCE, SPAWNER, DOOR, DESK, BLACKOUT
     }
 
     objectTypes type;
@@ -26,24 +30,33 @@ public class Object {
 
         switch(this.type) {
             case ENTRANCE:
+                String[] d = data.split("@");
+                Stairs.stairsList.add(new Stairs(x, y, Integer.parseInt(d[2]),Integer.parseInt(d[3]), Integer.parseInt(d[1]), Integer.parseInt(d[0])));
                 break;
             case SPAWNER:
-                switch(data) {
-                    case "0":
-                        Entity.entities.add(new EnemyLight(x, y, 10, 10));
-                        break;
-                    case "1":
-                        Entity.entities.add(new EnemyNormal(x, y, 14, 14));
-                        break;
-                    case "2":
-                        Entity.entities.add(new EnemyHeavy(x, y, 20, 20));
-                        break;
+                if(!Map.loaded[Main.level]) {
+                    switch(data) {
+                        case "0":
+                            Entity.entities.add(new EnemyLight(x, y, 14, 14));
+                            break;
+                        case "1":
+                            Entity.entities.add(new EnemyNormal(x, y, 15, 15));
+                            break;
+                        case "2":
+                            Entity.entities.add(new EnemyHeavy(x, y, 20, 20));
+                            break;
+                    }
                 }
                 break;
             case DOOR:
+                Door.doorList.add(new Door(x, y, 14, 14, variation == 0 ? true : false, rotation));
                 break;
             case DESK:
-                Entity.entities.add(new Desk(x, y, 14, 14, variation, rotation));
+                if(!Map.loaded[Main.level]) {
+                    Entity.entities.add(new Desk(x, y, 14, 14, variation, rotation));
+                }
+                break;
+            case BLACKOUT:
                 break;
         }
     }

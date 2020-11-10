@@ -8,6 +8,8 @@ import engine.drawing.Draw;
 import engine.physics.Physics;
 import engine.physics.Rect;
 import main.Main;
+import main.entities.moveable.combat.Player;
+
 import java.awt.Color;
 
 public class Damage {
@@ -15,7 +17,7 @@ public class Damage {
 
     Rect rect;
     int amount;
-    int timeOut = 20;
+    int timeOut = 10;
     int[] entitiesAffected = {0, 0, 0};
     int entitiesAffectedIndex = 0;
     boolean affectPlayer;
@@ -34,6 +36,8 @@ public class Damage {
         if (affectPlayer) {
             if (Physics.rectrect(rect, Main.player.rect)) {
                 Main.player.hp--;
+                timeOut = 0;
+                Sounds.play("playerhit"+Utils.rand(0, 1));
             }
         } else {
             for (int i = 0; i < Entity.entities.size(); i++) {
@@ -43,7 +47,11 @@ public class Damage {
                 Entity e = Entity.entities.get(i);
                 if (e.damageable) {
                     if (Physics.rectrect(rect, e.rect)) {
-                        Sounds.play("bonk");
+                        if(e.neutral) {
+                            Sounds.play("desk"+Utils.rand(0, 1));
+                        } else {
+                            Sounds.play("enemyhit"+Utils.rand(0, 2));
+                        }
                         e.hp -= amount;
                         entitiesAffected[entitiesAffectedIndex] = i;
                         if (++entitiesAffectedIndex > 2) {

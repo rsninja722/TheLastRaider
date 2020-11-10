@@ -20,7 +20,9 @@ public class Sound {
 	ArrayList<Clip> clips = new ArrayList<Clip>();
 	int clipIndex = 0;
 	boolean loopSet = false;
-	public boolean isMusic = false;
+    public boolean isMusic = false;
+    
+    float volume = 1.0f;
 
 	Sound(String filePath) {
 		try {
@@ -37,7 +39,8 @@ public class Sound {
 		try {
 			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filePathCache));
 			clips.add(index, AudioSystem.getClip());
-			clips.get(index).open(audioInputStream);
+            clips.get(index).open(audioInputStream);
+            adjustGainGlobal(Sounds.globalVolumeLevel);
 		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
 			System.out.println("Error loading sound" + filePathCache);
 		}
@@ -76,7 +79,7 @@ public class Sound {
 		clips.get(0).start();
 	}
 	
-	public void ajustGain(float gainLevel) {
+	public void adjustGain(float gainLevel) {
 		Iterator<Clip> clipItor = clips.iterator();
 		while(clipItor.hasNext()) {
 			Clip c = clipItor.next();
@@ -85,8 +88,23 @@ public class Sound {
 			
 			float gain = (float) Utils.mapRange(gainLevel, 0.0f, 1.0f, gainControl.getMinimum(), gainControl.getMaximum());
 
-			gainControl.setValue(gain);
+            gainControl.setValue(gain);
+            
+            volume = gainLevel;
 			
+		}
+		
+	}
+	public void adjustGainGlobal(float gainLevel) {
+		Iterator<Clip> clipItor = clips.iterator();
+		while(clipItor.hasNext()) {
+			Clip c = clipItor.next();
+			
+			FloatControl gainControl = (FloatControl) c.getControl(FloatControl.Type.MASTER_GAIN);
+			
+			float gain = (float) Utils.mapRange(gainLevel * volume, 0.0f, 1.0f, gainControl.getMinimum(), gainControl.getMaximum());
+
+            gainControl.setValue(gain);
 		}
 		
 	}

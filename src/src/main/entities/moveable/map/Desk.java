@@ -16,6 +16,8 @@ public class Desk extends Moveable {
         this.variation = variation;
         this.rotation = rotation;
 
+        neutral = true;
+
         // determine size
         switch (variation) {
             case 0:
