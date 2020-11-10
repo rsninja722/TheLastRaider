@@ -22,7 +22,7 @@ public class Sound {
 	boolean loopSet = false;
     public boolean isMusic = false;
     
-    float volume = 1.0f;
+    public float volume = 1.0f;
 
 	Sound(String filePath) {
 		try {

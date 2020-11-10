@@ -7,6 +7,7 @@ import engine.Utils;
 import engine.drawing.Draw;
 import engine.physics.Physics;
 import engine.physics.Rect;
+import main.Options;
 import main.entities.Entity;
 import main.entities.Wall;
 
@@ -67,9 +68,11 @@ public class Door  {
     }
 
     public void draw() {
-        Draw.image("door" + (openable ? 0 : 1), (int) rect.x, (int) rect.y, rotation * Math.PI / 2.0 - (open ? Math.PI/2.0 : 0), 1.0);
+        if(Options.quality) {
+            Draw.image("door" + (openable ? 0 : 1), (int) rect.x, (int) rect.y, rotation * Math.PI / 2.0 - (open ? Math.PI/2.0 : 0), 1.0);
+        }
     
-        if(Utils.debugMode) {
+        if(Utils.debugMode || (!Options.quality&&!openable)) {
             Draw.setColor(Color.LIGHT_GRAY);
             Draw.rectOutline(rect);
         }

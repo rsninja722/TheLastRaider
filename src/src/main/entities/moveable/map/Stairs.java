@@ -7,6 +7,7 @@ import engine.drawing.Draw;
 import engine.physics.Physics;
 import engine.physics.Point;
 import main.Main;
+import main.Music;
 import main.entities.Entity;
 
 import java.awt.Color;
@@ -36,6 +37,7 @@ public class Stairs extends Entity {
                 Main.stairsID = id;
                 Main.level = floor;
                 Main.state = Main.State.TRANSITION;
+                Music.dontChange = true;
             }
         }
 

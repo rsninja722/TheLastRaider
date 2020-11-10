@@ -8,7 +8,6 @@ import java.awt.Color;
 
 public class Button extends Component {
 
-    String text;
     int size;
     Runnable callBack;
 
@@ -29,8 +28,8 @@ public class Button extends Component {
             }
         } else {
             Draw.setColor(new Color(43, 48, 48));
-            Draw.rect(rect);
         }
+        Draw.rect(rect);
 
         Draw.setColor(new Color(230,230,230));
         Draw.setFontSize(size);

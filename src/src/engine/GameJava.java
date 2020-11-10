@@ -7,6 +7,9 @@ import engine.drawing.Sprites;
 import java.awt.Color;
 import java.nio.file.Paths;
 
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
 /*
  * TODO:
  * line collition
@@ -55,7 +58,19 @@ public class GameJava {
      */
     public GameJava(int gameWidth, int gameHeight, int fps, int ups) {
         game = this;
+
+        JFrame frame = new JFrame();
+        frame.add(new JLabel("loading..."));
+        frame.setUndecorated(true);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+
+        
         init(gameWidth, gameHeight, fps, ups);
+        
+        frame.setVisible(false);
+        frame.dispose();
     }
 
     // calculates frame rate nanosecond speeds and initializes drawing

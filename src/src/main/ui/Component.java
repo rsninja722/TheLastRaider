@@ -10,6 +10,9 @@ import main.Main;
 
 public class Component {
 
+    public String text;
+    public float percent = 1.0f;
+
     Rect rect;
 
     float x;

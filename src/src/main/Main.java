@@ -5,10 +5,51 @@ package main;
  * 2020.10.22
  * The Last Raider
  * 
+ * top down zombie survival game, focusing on melee combat
+ * map made with a modified version of an editor for a different game
+ * map and code by James
+ * audio and most art assets, and map renders by Nathan Desjardins
+ * 
+ * Code Highlights
+ * parts of the code that were more difficult for me:
+ * A* path finding (/util/AStar.java, /util/Node.java)
+ * Entity system, especially movable entities (/entities/moveable)
+ * 
+ * Debug
+ * press f3 to enter debug mode
+ * this will show fps, player info, and hitboxes
+ * pressing v will toggle collision for the player
+ * 
+ * Story
+ * The school has been infected with zombies overnight. They seem to have some generic airborne disease causing there zombification.
+ * You, as the last combat ready Beal Raider must clear out the school of any zombies. The source of the infection seems to be coming 
+ * from the gym, make your way down there and find out what is happening.
+ * 
+ * How To Play
+ * 
+ * to go between floors, walk to the top/bottom of the staircase you would normally 
+ * 
+ * movement
+ *      wasd - move
+ *      space - dash in current direction
+ * 
+ * escape - pause open and options
+ *
+ * combat
+ * click mode
+ *      lmb - swipe
+ *      rmb - jab
+ *      hold lmb and rmb - spin
+ * motion mode
+ *      rmb - turn towards mouse
+ *      hold lmb and drag a
+ *          line away from player - jab
+ *          line perpendicular to player - swipe
+ *          circle - spin
+ *
  * TODO
  * death permanence
  * music
- * death
  * dark rooms
  * bow
  * blocking
@@ -28,7 +69,9 @@ import main.entities.moveable.map.Stairs;
 import main.map.LoadMap;
 import main.map.Map;
 import main.ui.Component;
+import main.ui.GameOver;
 import main.ui.MainMenu;
+import main.ui.OptionsUI;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -36,23 +79,30 @@ import java.util.ArrayList;
 
 public class Main extends GameJava {
 
+    // possible game states
     public enum State {
-        TITLE, CUTSCENE, TRANSITION, PLAYING
+        TITLE, CUTSCENE, TRANSITION, PLAYING, GAMEOVER, OPTIONS;
     }
 
     public static State state = State.TITLE;
+    public static State lastState = State.CUTSCENE;
 
     public static boolean showHitboxes = false;
 
     public static Entity player;
 
+    // level file names
     static String[] levels = {"basement", "first", "second", "third"};
 
+    // level to show
     public static int drawLevel = 0;
+    // level to use in update
     public static int level = 0;
 
+    // which stair to spawn at
     public static int stairsID = 9;
     
+    // counter for fade in/out
     public static int transitionTime = 21;
 
     public static void main(String[] args) {
@@ -62,6 +112,7 @@ public class Main extends GameJava {
     public Main() {
         super(800, 600, 60, 60);
 
+        // adjust sound volume
         Sounds.globalVolume(0.9f);
         Sounds.adjustGain("swordswoosh", 0.9f);
         Sounds.adjustGain("desk0", 0.8f);
@@ -70,15 +121,22 @@ public class Main extends GameJava {
         Sounds.adjustGain("walk1", 0.95f);
         Sounds.adjustGain("walk2", 0.95f);
 
+        // create UI
         MainMenu.generate();
+        GameOver.generate();
+        OptionsUI.generate();
 
+        // create entity list for each level
         for(int i = 0;i<4;i++) {
             Entity.entitiesList.add(new ArrayList<Entity>());
         }
+        // set current entity list to third floor
         Entity.entities = Entity.entitiesList.get(3);
 
+        // create player
         player = new Player(1160, 1530, 12, 12);
 
+        // set which level to show
         drawLevel = 3;
 
         LoopManager.startLoops(this);
@@ -99,11 +157,13 @@ public class Main extends GameJava {
 
     @Override
     public void update() {
+        Music.update();
+        lastState = state; 
         switch (state) {
             case TITLE:
                 Component.updateAll(MainMenu.components);
                 break;
-            case CUTSCENE:
+                case CUTSCENE:
                 break;
             case TRANSITION:
                 if(transitionTime > 0) {
@@ -120,10 +180,20 @@ public class Main extends GameJava {
                 }
                 break;
             case PLAYING:
+                Music.dontChange = false;
                 Entity.updateAll();
                 Stairs.updateAll();
                 Door.updateAll();
                 Damage.updateAll();
+                break;
+            case GAMEOVER:
+                Component.updateAll(GameOver.components);
+                break;
+            case OPTIONS:
+                Component.updateAll(OptionsUI.components);
+                if(Input.keyClick(KeyCodes.ESCAPE)) {
+                    OptionsUI.back();
+                }
                 break;
         }
 
@@ -149,8 +219,10 @@ public class Main extends GameJava {
                 }
                 // Draw.image(Map.img, w / 2, h / 2, w, h);
                 // Draw.image(drawLevel+"bottom", w / 2, h / 2);
-                Draw.image(Map.levelImgs[drawLevel],w / 2, h / 2,w,h);
-                
+                if(Options.quality) {
+                    Draw.image(Map.levelImgs[drawLevel],w / 2, h / 2,w,h);
+                }
+
                 Door.drawAll();
 
                 for (int i = 0; i < Entity.entities.size(); i++) {
@@ -160,7 +232,13 @@ public class Main extends GameJava {
                 Stairs.drawAll();
                 Damage.drawAll();
 
-                Draw.image(drawLevel+"top", w / 2, h / 2);
+                if(Options.quality) {
+                    Draw.image(drawLevel+"top", w / 2, h / 2);
+                }
+                break;
+            case GAMEOVER:
+                break;
+            case OPTIONS:
                 break;
         }
 
@@ -170,8 +248,11 @@ public class Main extends GameJava {
     public void absoluteDraw() {
         switch (state) {
             case TITLE:
-            Draw.setColor(new Color(20,20,20));
+                Draw.setColor(new Color(20,20,20));
                 Draw.rect(gw/2, gh/2, gw, gh);
+                int scale = (int)Math.ceil(gw/400)+1;
+                Draw.image("menuBack", gw/2, gh/2, 0, scale);
+                Draw.image("lightWalk"+Math.round(updateCount/5)%4,((int)updateCount%(gw) - 100)*scale, gh/2-scale*25, 0, scale);
                 Component.drawAll(MainMenu.components);
                 break;
             case CUTSCENE:
@@ -185,6 +266,19 @@ public class Main extends GameJava {
                 Draw.rect(gw/2, gh/2, gw, gh);
                 break;
             case PLAYING:
+                break;
+            case GAMEOVER:
+                Draw.setColor(new Color(20,20,20));
+                Draw.rect(gw/2, gh/2, gw, gh);
+                Component.drawAll(GameOver.components);
+                break;
+            case OPTIONS:
+                Draw.setColor(new Color(20,20,20));
+                Draw.rect(gw/2, gh/2, gw, gh);
+                Draw.setColor(Color.WHITE);
+                Draw.setFontSize(4);
+                Draw.text("Options", gw/2-50, 50);
+                Component.drawAll(OptionsUI.components);
                 break;
         }
     }

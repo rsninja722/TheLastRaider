@@ -38,6 +38,8 @@ public class Player extends Moveable {
 
     boolean noClip = false;
 
+    int lives = 3;
+
     public Player(double x, double y, int w, int h) {
         super(x, y, w, h);
         cameraTarget = new Point(Camera.x, Camera.y);
@@ -48,23 +50,22 @@ public class Player extends Moveable {
 
     @Override
     public boolean update() {
+        if(hp <= 0) {
+            if(--lives == 0) {
+                Main.state = Main.State.GAMEOVER;
+                return false;
+            }
+            setHP(20);
+            Main.state = Main.State.TRANSITION;
+        }
+
+        if(Input.keyClick(KeyCodes.ESCAPE)) {
+            Options.enterOptions();
+        }
 
         if (Utils.debugMode) {
             if (Input.keyClick(KeyCodes.V)) {
                 noClip = !noClip;
-            }
-
-            if (Input.keyClick(KeyCodes.NUM0)) {
-                Main.loadLevel(0);
-            }
-            if (Input.keyClick(KeyCodes.NUM1)) {
-                Main.loadLevel(1);
-            }
-            if (Input.keyClick(KeyCodes.NUM2)) {
-                Main.loadLevel(2);
-            }
-            if (Input.keyClick(KeyCodes.NUM3)) {
-                Main.loadLevel(3);
             }
         }
 
@@ -132,7 +133,9 @@ public class Player extends Moveable {
             walkAngle = Utils.turnTo(walkAngle, Utils.pointTo(rect.x, rect.y, rect.x + moveX, rect.y + moveY), 0.2);
         }
 
-        angle = Utils.turnTo(angle, Utils.pointTo(rect.x, rect.y, Input.mousePos.x, Input.mousePos.y), 0.2);
+        if(Options.useMotionControl ? Input.mouseDown(2) : true) {
+            angle = Utils.turnTo(angle, Utils.pointTo(rect.x, rect.y, Input.mousePos.x, Input.mousePos.y), 0.2);
+        }
 
         if (Options.useMotionControl) {
             // start tracking attack
