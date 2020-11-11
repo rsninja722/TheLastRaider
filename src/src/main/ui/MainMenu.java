@@ -7,8 +7,10 @@ import main.Main;
 import main.Music;
 import main.Options;
 
+// buttons for main menu
+
 public class MainMenu {
-    
+
     public static ArrayList<Component> components = new ArrayList<Component>();
 
     public static void generate() {
@@ -20,6 +22,6 @@ public class MainMenu {
         Main.state = Main.State.TRANSITION;
         Main.stairsID = 9;
         Main.level = 3;
-        Music.play(Utils.rand(0,5));
+        Music.play(Utils.rand(0, 5));
     }
 }

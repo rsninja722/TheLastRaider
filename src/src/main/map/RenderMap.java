@@ -9,6 +9,8 @@ import javax.imageio.ImageIO;
 
 import main.Constants;
 
+// was used to render map without lighting 
+
 public class RenderMap {
     public static void render() {
         // if (Map.tiles != null) {

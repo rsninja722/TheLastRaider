@@ -20,8 +20,9 @@ public class Button extends Component {
 
     @Override
     public void draw() {
-        if(Physics.rectpoint(rect, Input.rawMousePos)) {
-            if(Input.mouseDown(0)) {
+        // background color
+        if (Physics.rectpoint(rect, Input.rawMousePos)) {
+            if (Input.mouseDown(0)) {
                 Draw.setColor(new Color(22, 26, 26));
             } else {
                 Draw.setColor(new Color(65, 71, 71));
@@ -31,18 +32,21 @@ public class Button extends Component {
         }
         Draw.rect(rect);
 
-        Draw.setColor(new Color(230,230,230));
+        // text
+        Draw.setColor(new Color(230, 230, 230));
         Draw.setFontSize(size);
         Draw.text(this.text, (int) (10 + rect.x - rect.w / 2), (int) rect.y + 12);
 
+        // border
         Draw.setColor(new Color(76, 79, 79));
         Draw.rectOutline(rect);
     }
 
     @Override
     public void update() {
-        if(Physics.rectpoint(rect, Input.rawMousePos)) {
-            if(Input.mouseClick(0)) {
+        // run callback on click
+        if (Physics.rectpoint(rect, Input.rawMousePos)) {
+            if (Input.mouseClick(0)) {
                 this.callBack.run();
             }
         }

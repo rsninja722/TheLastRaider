@@ -6,8 +6,10 @@ import main.Main;
 import main.entities.Entity;
 import main.entities.moveable.combat.Player;
 
+// buttons for game over menu
+
 public class GameOver {
-    
+
     public static ArrayList<Component> components = new ArrayList<Component>();
 
     public static void generate() {
@@ -19,7 +21,7 @@ public class GameOver {
         Main.stairsID = 9;
         Main.level = 3;
 
-        for(int i = 0;i<4;i++) {
+        for (int i = 0; i < 4; i++) {
             Entity.entitiesList.add(new ArrayList<Entity>());
         }
         Entity.entities = Entity.entitiesList.get(3);

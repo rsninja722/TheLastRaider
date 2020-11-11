@@ -14,6 +14,7 @@ package main;
  * parts of the code that were more difficult for me:
  * A* path finding (/util/AStar.java, /util/Node.java)
  * Entity system, especially movable entities (/entities/moveable)
+ * Gesture base attack system, it does not work that well, but it was new to me (/entities/movable/combat/Player.java) 
  * 
  * Debug
  * press f3 to enter debug mode
@@ -76,7 +77,6 @@ import main.ui.OptionsUI;
 import java.awt.Color;
 import java.util.ArrayList;
 
-
 public class Main extends GameJava {
 
     // possible game states
@@ -92,7 +92,7 @@ public class Main extends GameJava {
     public static Entity player;
 
     // level file names
-    static String[] levels = {"basement", "first", "second", "third"};
+    static String[] levels = { "basement", "first", "second", "third" };
 
     // level to show
     public static int drawLevel = 0;
@@ -101,7 +101,7 @@ public class Main extends GameJava {
 
     // which stair to spawn at
     public static int stairsID = 9;
-    
+
     // counter for fade in/out
     public static int transitionTime = 21;
 
@@ -127,7 +127,7 @@ public class Main extends GameJava {
         OptionsUI.generate();
 
         // create entity list for each level
-        for(int i = 0;i<4;i++) {
+        for (int i = 0; i < 4; i++) {
             Entity.entitiesList.add(new ArrayList<Entity>());
         }
         // set current entity list to third floor
@@ -142,9 +142,13 @@ public class Main extends GameJava {
         LoopManager.startLoops(this);
     }
 
+    // queues a level to be loaded, and transitioned to 
     public static void loadLevel(int lvl) {
+        // clear non permanent array lists 
         Door.doorList = new ArrayList<Door>();
         Stairs.stairsList = new ArrayList<Stairs>();
+
+        // set entity aray list
         Entity.entities.remove(player);
         Entity.entities = Entity.entitiesList.get(lvl);
         Entity.entities.add(player);
@@ -152,28 +156,32 @@ public class Main extends GameJava {
         level = lvl;
 
         LoadMap.loadMap(baseDirectory + directoryChar + "levels" + directoryChar + levels[level] + ".txt");
+
+        // make sure the image is not redrawn next time
         Map.loaded[level] = true;
     }
 
     @Override
     public void update() {
         Music.update();
-        lastState = state; 
+        lastState = state;
         switch (state) {
             case TITLE:
                 Component.updateAll(MainMenu.components);
                 break;
-                case CUTSCENE:
+            case CUTSCENE:
                 break;
             case TRANSITION:
-                if(transitionTime > 0) {
+                // fade in and out
+                if (transitionTime > 0) {
                     transitionTime--;
-                    if(transitionTime == 20) {
+                    if (transitionTime == 20) {
+                        // switch level when screen is black
                         drawLevel = level;
                         loadLevel(level);
-                        Camera.centerOn((int)player.rect.x,(int)player.rect.y);
+                        Camera.centerOn((int) player.rect.x, (int) player.rect.y);
                     }
-                    
+
                 } else {
                     transitionTime = 40;
                     state = State.PLAYING;
@@ -191,7 +199,7 @@ public class Main extends GameJava {
                 break;
             case OPTIONS:
                 Component.updateAll(OptionsUI.components);
-                if(Input.keyClick(KeyCodes.ESCAPE)) {
+                if (Input.keyClick(KeyCodes.ESCAPE)) {
                     OptionsUI.back();
                 }
                 break;
@@ -208,19 +216,21 @@ public class Main extends GameJava {
                 break;
             case TRANSITION:
             case PLAYING:
-                Draw.setColor(new Color(30, 30, 30));
+                // black background
+                Draw.setColor(new Color(0, 0, 0));
                 Draw.rect(-Camera.x + gw / 2, -Camera.y + gh / 2, gw / (int) Camera.zoom, gh / (int) Camera.zoom);
 
+                // find size of current floor
                 int w = 1920;
                 int h = 2400;
-                if(Map.levelImgs[level] != null) {
+                if (Map.levelImgs[level] != null) {
                     w = Map.levelImgs[level].getWidth();
                     h = Map.levelImgs[level].getHeight();
                 }
-                // Draw.image(Map.img, w / 2, h / 2, w, h);
-                // Draw.image(drawLevel+"bottom", w / 2, h / 2);
-                if(Options.quality) {
-                    Draw.image(Map.levelImgs[drawLevel],w / 2, h / 2,w,h);
+
+                // rendered level base
+                if (Options.quality) {
+                    Draw.image(Map.levelImgs[drawLevel], w / 2, h / 2, w, h);
                 }
 
                 Door.drawAll();
@@ -232,8 +242,9 @@ public class Main extends GameJava {
                 Stairs.drawAll();
                 Damage.drawAll();
 
-                if(Options.quality) {
-                    Draw.image(drawLevel+"top", w / 2, h / 2);
+                // rendered level lighting
+                if (Options.quality) {
+                    Draw.image(drawLevel + "top", w / 2, h / 2);
                 }
                 break;
             case GAMEOVER:
@@ -248,36 +259,50 @@ public class Main extends GameJava {
     public void absoluteDraw() {
         switch (state) {
             case TITLE:
-                Draw.setColor(new Color(20,20,20));
-                Draw.rect(gw/2, gh/2, gw, gh);
-                int scale = (int)Math.ceil(gw/400)+1;
-                Draw.image("menuBack", gw/2, gh/2, 0, scale);
-                Draw.image("lightWalk"+Math.round(updateCount/5)%4,((int)updateCount%(gw) - 100)*scale, gh/2-scale*25, 0, scale);
+                // background color
+                Draw.setColor(new Color(20, 20, 20));
+                Draw.rect(gw / 2, gh / 2, gw, gh);
+
+                // background image with enemy running across
+                int scale = (int) Math.ceil(gw / 400) + 1;
+                Draw.image("menuBack", gw / 2, gh / 2, 0, scale);
+                Draw.image("lightWalk" + Math.round(updateCount / 5) % 4, ((int) updateCount % (gw) - 100) * scale, gh / 2 - scale * 25, 0, scale);
+
+                // buttons
                 Component.drawAll(MainMenu.components);
                 break;
             case CUTSCENE:
                 break;
             case TRANSITION:
-                if(transitionTime > 20) {
-                    Draw.setColor(new Color(0,0,0, (int)Utils.mapRange(transitionTime, 20, 40, 255, 0)));
+                // fade in/out
+                if (transitionTime > 20) {
+                    Draw.setColor(new Color(0, 0, 0, (int) Utils.mapRange(transitionTime, 20, 40, 255, 0)));
                 } else {
-                    Draw.setColor(new Color(0,0,0, (int)Utils.mapRange(20-transitionTime, 0, 20, 255, 0)));
+                    Draw.setColor(new Color(0, 0, 0, (int) Utils.mapRange(20 - transitionTime, 0, 20, 255, 0)));
                 }
-                Draw.rect(gw/2, gh/2, gw, gh);
+                Draw.rect(gw / 2, gh / 2, gw, gh);
                 break;
             case PLAYING:
                 break;
             case GAMEOVER:
-                Draw.setColor(new Color(20,20,20));
-                Draw.rect(gw/2, gh/2, gw, gh);
+                // background color
+                Draw.setColor(new Color(20, 20, 20));
+                Draw.rect(gw / 2, gh / 2, gw, gh);
+
+                // buttons
                 Component.drawAll(GameOver.components);
                 break;
             case OPTIONS:
-                Draw.setColor(new Color(20,20,20));
-                Draw.rect(gw/2, gh/2, gw, gh);
+                // background color
+                Draw.setColor(new Color(20, 20, 20));
+                Draw.rect(gw / 2, gh / 2, gw, gh);
+
+                // options title
                 Draw.setColor(Color.WHITE);
                 Draw.setFontSize(4);
-                Draw.text("Options", gw/2-50, 50);
+                Draw.text("Options", gw / 2 - 50, 50);
+
+                // buttons
                 Component.drawAll(OptionsUI.components);
                 break;
         }
