@@ -15,7 +15,9 @@ public class Tile extends Entity {
     }
 
     public tileTypes type;
+    // number from 0-3
     public int rotation;
+    // what image should be displayed
     public int variation;
 
     public Tile(double x, double y, int type, int variation, int rotation) {
@@ -26,20 +28,20 @@ public class Tile extends Entity {
     }
 
     public void draw(Graphics2D g) {
-        // draw rotated
-        if(rotation != 0 ) {
+        // draw rotated tile
+        if (rotation != 0) {
             AffineTransform t = g.getTransform();
 
-            g.translate((int)rect.x + Constants.TILE_SCALE/2, (int)rect.y + Constants.TILE_SCALE/2);
+            g.translate((int) rect.x + Constants.TILE_SCALE / 2, (int) rect.y + Constants.TILE_SCALE / 2);
             g.rotate(rotation * Math.PI / 2);
 
             Sprite spr = Sprites.get(type.toString().toLowerCase() + variation);
-            g.drawImage(spr.img, Math.round(-spr.width/2), Math.round(-spr.height/2), null);
+            g.drawImage(spr.img, Math.round(-spr.width / 2), Math.round(-spr.height / 2), null);
 
             g.setTransform(t);
-        // normal draw
+            // normal draw
         } else {
-            g.drawImage(Sprites.get(type.toString().toLowerCase() + variation).img, (int)rect.x, (int)rect.y, null);
+            g.drawImage(Sprites.get(type.toString().toLowerCase() + variation).img, (int) rect.x, (int) rect.y, null);
         }
     }
 }

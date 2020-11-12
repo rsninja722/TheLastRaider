@@ -16,37 +16,38 @@ public class EnemyNormal extends Enemy {
         setHP(20);
     }
 
+    // swipe attack
     @Override
     public void attack() {
-        if(attackTime == 0) {
+        if (attackTime == 0) {
             attackTime = 90;
         } else {
             attackTime--;
         }
         if (attackTime == 13 || attackTime == 8 || attackTime == 3) {
             double ang = angle + (-7 + attackTime) / 10.0;
-            Damage.damages.add( new Damage(rect.x + Math.cos(ang) * 10.0, rect.y + Math.sin(ang) * 10.0, 4, 4, 5, true));
+            Damage.damages.add(new Damage(rect.x + Math.cos(ang) * 10.0, rect.y + Math.sin(ang) * 10.0, 4, 4, 5, true));
         }
     }
 
     @Override
     public void draw() {
-        if(attackTime > 0 && attackTime < 50) {
-            if(attackTime > 20) {
-                Draw.image("normalWindup", (int)rect.x, (int)rect.y, angle, 1);
-            } else if(attackTime > 10) {
-                Draw.image("normalAttack0", (int)rect.x, (int)rect.y, angle - (20-attackTime)/10.0, 1);
+        if (attackTime > 0 && attackTime < 50) {
+            if (attackTime > 20) {
+                Draw.image("normalWindup", (int) rect.x, (int) rect.y, angle, 1);
+            } else if (attackTime > 10) {
+                Draw.image("normalAttack0", (int) rect.x, (int) rect.y, angle - (20 - attackTime) / 10.0, 1);
             } else {
-                Draw.image("normalAttack1", (int)rect.x, (int)rect.y, angle - (20-attackTime)/10.0, 1);
+                Draw.image("normalAttack1", (int) rect.x, (int) rect.y, angle - (20 - attackTime) / 10.0, 1);
             }
         } else {
-            if(moving) {
-                Draw.image("normalWalk"+walkCycle, (int)rect.x, (int)rect.y, angle, 1);
+            if (moving) {
+                Draw.image("normalWalk" + walkCycle, (int) rect.x, (int) rect.y, angle, 1);
             } else {
-                Draw.image("normal", (int)rect.x, (int)rect.y, angle, 1);
+                Draw.image("normal", (int) rect.x, (int) rect.y, angle, 1);
             }
         }
-        
+
         baseDraw();
     }
 }

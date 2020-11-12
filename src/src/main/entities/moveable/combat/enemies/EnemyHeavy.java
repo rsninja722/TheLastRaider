@@ -16,9 +16,10 @@ public class EnemyHeavy extends Enemy {
         setHP(40);
     }
 
+    // spin attack
     @Override
     public void attack() {
-        if(attackTime == 0) {
+        if (attackTime == 0) {
             attackTime = 120;
         } else {
             attackTime--;
@@ -26,28 +27,28 @@ public class EnemyHeavy extends Enemy {
         if (attackTime % 2 == 0 && attackTime < 30) {
             double ang = angle + (30 - attackTime) * 0.2;
             Damage.damages.add(new Damage(rect.x + Math.cos(ang) * 16.0, rect.y + Math.sin(ang) * 16.0, 4, 4, 2, true));
-            Damage.damages.add(new Damage(rect.x + Math.cos(ang-Math.PI) * 16.0, rect.y + Math.sin(ang-Math.PI) * 16.0, 4, 4, 2, true));
+            Damage.damages.add(new Damage(rect.x + Math.cos(ang - Math.PI) * 16.0, rect.y + Math.sin(ang - Math.PI) * 16.0, 4, 4, 2, true));
         }
     }
 
     @Override
     public void draw() {
-        if(attackTime > 0) {
-            if(attackTime > 35) {
-                Draw.image("heavyWindup", (int)rect.x, (int)rect.y, angle, 1);
+        if (attackTime > 0) {
+            if (attackTime > 35) {
+                Draw.image("heavyWindup", (int) rect.x, (int) rect.y, angle, 1);
             } else if (attackTime > 30) {
-                Draw.image("heavy", (int)rect.x, (int)rect.y, angle, 1);
+                Draw.image("heavy", (int) rect.x, (int) rect.y, angle, 1);
             } else {
-                Draw.image("heavyAttack", (int)rect.x , (int)rect.y, angle + (30 - attackTime) * 0.2 , 1);
+                Draw.image("heavyAttack", (int) rect.x, (int) rect.y, angle + (30 - attackTime) * 0.2, 1);
             }
         } else {
-            if(moving) {
-                Draw.image("heavyWalk"+walkCycle, (int)rect.x, (int)rect.y, angle, 1);
+            if (moving) {
+                Draw.image("heavyWalk" + walkCycle, (int) rect.x, (int) rect.y, angle, 1);
             } else {
-                Draw.image("heavy", (int)rect.x, (int)rect.y, angle, 1);
+                Draw.image("heavy", (int) rect.x, (int) rect.y, angle, 1);
             }
         }
-        
+
         baseDraw();
     }
 

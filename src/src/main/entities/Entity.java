@@ -10,35 +10,33 @@ import java.awt.Color;
 
 public class Entity {
 
+    // array list of entities for each floor, so what happens is permanent
     public static ArrayList<ArrayList<Entity>> entitiesList = new ArrayList<ArrayList<Entity>>();
 
+    // entities list for the current floor
     public static ArrayList<Entity> entities;
 
+    // hit box
     public Rect rect;
+
+    // used by other entities, the are here so they can be accessed publicly
     public boolean moveable = false;
     public boolean damageable = false;
     public boolean neutral = false;
     public int hp;
     public int maxHp;
 
-    public static void updateAll() {
-        for (int i = 0; i < entities.size(); i++) {
-            if(entities.get(i).update()) {
-                entities.remove(i);
-            }
-        }
-    }
-
     public Entity(double x, double y, int w, int h) {
         this.rect = new Rect(x, y, w, h);
     }
 
+    // return true if entity should be deleted
     public boolean update() {
         return false;
     }
 
     public void draw() {
-        if(Utils.debugMode) {
+        if (Utils.debugMode) {
             Draw.setColor(Color.LIGHT_GRAY);
             Draw.rectOutline(rect);
         }
@@ -61,6 +59,14 @@ public class Entity {
     }
 
     public void applyForce(double xVel, double yVel) {
+    }
+    
+    public static void updateAll() {
+        for (int i = 0; i < entities.size(); i++) {
+            if (entities.get(i).update()) {
+                entities.remove(i);
+            }
+        }
     }
 
     // returns an entity a rectangle is colliding with

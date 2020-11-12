@@ -28,6 +28,14 @@ public class Component {
         this.y = y;
     }
 
+    public void draw() {
+        Draw.setColor(Color.WHITE);
+        Draw.rect(rect);
+    }
+
+    public void update() {
+    }
+    
     public static void drawAll(ArrayList<Component> components) {
         Draw.setLineWidth(2);
         for (int i = 0; i < components.size(); i++) {
@@ -49,13 +57,5 @@ public class Component {
                 c.update();
             }
         }
-    }
-
-    public void draw() {
-        Draw.setColor(Color.WHITE);
-        Draw.rect(rect);
-    }
-
-    public void update() {
     }
 }

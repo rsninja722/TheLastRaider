@@ -16,9 +16,10 @@ public class Desk extends Moveable {
         this.variation = variation;
         this.rotation = rotation;
 
+        // can be damaged by player and enemies
         neutral = true;
 
-        // determine size
+        // determine size of hit box
         switch (variation) {
             case 0:
                 if (rotation == 0 || rotation == 2) {
@@ -39,14 +40,14 @@ public class Desk extends Moveable {
                 break;
         }
 
-        setHP(30);
-        damageable = true; 
+        setHP(20);
+        damageable = true;
     }
 
     @Override
     public boolean update() {
         move();
-        if(hp < 1) {
+        if (hp < 1) {
             return true;
         }
         return false;
@@ -54,13 +55,13 @@ public class Desk extends Moveable {
 
     @Override
     public void draw() {
-        if(this.hp < 16) {
-            Draw.image("desk" + variation + "damage", (int) rect.x, (int) rect.y, rotation * Math.PI / 2.0, 1.0);   
+        if (this.hp < 11) {
+            Draw.image("desk" + variation + "damage", (int) rect.x, (int) rect.y, rotation * Math.PI / 2.0, 1.0);
         } else {
             Draw.image("desk" + variation, (int) rect.x, (int) rect.y, rotation * Math.PI / 2.0, 1.0);
         }
 
-        if(Utils.debugMode) {
+        if (Utils.debugMode) {
             Draw.setColor(Color.GREEN);
             Draw.rectOutline(rect);
         }

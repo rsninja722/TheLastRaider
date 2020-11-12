@@ -42,7 +42,7 @@ public class GameJava {
     public static boolean running = true;
 
     /** title that displays in the top frame bar */
-    public static String frameTitle = "game title";
+    public static String frameTitle = "The Last Raider";
 
     // character that separates file paths
     public static String directoryChar = System.getProperty("file.separator");

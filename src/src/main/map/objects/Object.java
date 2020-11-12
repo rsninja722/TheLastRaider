@@ -21,21 +21,23 @@ public class Object {
     String data;
 
     public Object(double x, double y, int type, int variation, int rotation, String data) {
-        x+=8;
-        y+=8;
+        // center object on tile
+        x += 8;
+        y += 8;
         this.type = objectTypes.values()[type];
         this.rotation = rotation;
         this.variation = variation;
+        // any extra information needed for a specific object
         this.data = data;
 
-        switch(this.type) {
+        switch (this.type) {
             case ENTRANCE:
                 String[] d = data.split("@");
-                Stairs.stairsList.add(new Stairs(x, y, Integer.parseInt(d[2]),Integer.parseInt(d[3]), Integer.parseInt(d[1]), Integer.parseInt(d[0])));
+                Stairs.stairsList.add(new Stairs(x, y, Integer.parseInt(d[2]), Integer.parseInt(d[3]), Integer.parseInt(d[1]), Integer.parseInt(d[0])));
                 break;
             case SPAWNER:
-                if(!Map.loaded[Main.level]) {
-                    switch(data) {
+                if (!Map.loaded[Main.level]) {
+                    switch (data) {
                         case "0":
                             Entity.entities.add(new EnemyLight(x, y, 14, 14));
                             break;
@@ -52,7 +54,7 @@ public class Object {
                 Door.doorList.add(new Door(x, y, 14, 14, variation == 0 ? true : false, rotation));
                 break;
             case DESK:
-                if(!Map.loaded[Main.level]) {
+                if (!Map.loaded[Main.level]) {
                     Entity.entities.add(new Desk(x, y, 14, 14, variation, rotation));
                 }
                 break;

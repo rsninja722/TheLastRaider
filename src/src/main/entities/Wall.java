@@ -14,7 +14,7 @@ public class Wall extends Entity {
 
     @Override
     public void draw() {
-        if(Utils.debugMode || !Options.quality) {
+        if (Utils.debugMode || !Options.quality) {
             Draw.setColor(Color.LIGHT_GRAY);
             Draw.rectOutline(rect);
         }

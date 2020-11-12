@@ -49,8 +49,8 @@ package main;
  *          circle - spin
  *
  * TODO
+ * js
  * death permanence
- * music
  * dark rooms
  * bow
  * blocking

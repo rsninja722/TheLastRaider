@@ -47,16 +47,18 @@ public class Moveable extends Entity {
 
     @Override
     public void move() {
-        // x
+        // move in the x
         int moveX = roundVelocity(velX);
         rect.x += moveX;
+        // check collision if moved
         if (moveX != 0) {
             handleCollision();
         }
 
-        // y
+        // move in the y
         int moveY = roundVelocity(velY);
         rect.y += moveY;
+        // check collision if moved
         if (moveY != 0) {
             handleCollision();
         }

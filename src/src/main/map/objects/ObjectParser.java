@@ -10,17 +10,13 @@ public class ObjectParser {
 
         for (int i = 0; i < objects.length; i++) {
             String[] data = objects[i].split("~");
-            
+
             // create object without data
-            if(data.length == 5) {
-                returnObjects[i] = new Object(Integer.parseInt(data[0]) * Constants.TILE_SCALE,
-                Integer.parseInt(data[1]) * Constants.TILE_SCALE, Integer.parseInt(data[2]),
-                Integer.parseInt(data[3]), Integer.parseInt(data[4]), "");
-            // create object with data
+            if (data.length == 5) {
+                returnObjects[i] = new Object(Integer.parseInt(data[0]) * Constants.TILE_SCALE, Integer.parseInt(data[1]) * Constants.TILE_SCALE, Integer.parseInt(data[2]), Integer.parseInt(data[3]), Integer.parseInt(data[4]), "");
+                // create object with data
             } else {
-                returnObjects[i] = new Object(Integer.parseInt(data[0]) * Constants.TILE_SCALE,
-                    Integer.parseInt(data[1]) * Constants.TILE_SCALE, Integer.parseInt(data[2]),
-                    Integer.parseInt(data[3]), Integer.parseInt(data[4]), data[5]);
+                returnObjects[i] = new Object(Integer.parseInt(data[0]) * Constants.TILE_SCALE, Integer.parseInt(data[1]) * Constants.TILE_SCALE, Integer.parseInt(data[2]), Integer.parseInt(data[3]), Integer.parseInt(data[4]), data[5]);
             }
         }
 
