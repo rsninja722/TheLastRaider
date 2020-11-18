@@ -25,6 +25,8 @@ public class Music {
     // if the music should not be changing
     static public boolean dontChange = false;
 
+    static public double volume = 1.0;
+
     public static void update() {
 
         // when playing starts, play a random track
@@ -60,7 +62,7 @@ public class Music {
             activeTrack = index;
 
             // set gain
-            Sounds.adjustGain(tracks[index], 0.9f);
+            Sounds.adjustGain(tracks[index], 0.9f * (float)volume );
 
             // stop all tracks
             for (int i = 0; i < 7; i++) {

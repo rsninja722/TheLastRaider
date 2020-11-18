@@ -26,8 +26,8 @@ public class EnemyHeavy extends Enemy {
         }
         if (attackTime % 2 == 0 && attackTime < 30) {
             double ang = angle + (30 - attackTime) * 0.2;
-            Damage.damages.add(new Damage(rect.x + Math.cos(ang) * 16.0, rect.y + Math.sin(ang) * 16.0, 4, 4, 2, true));
-            Damage.damages.add(new Damage(rect.x + Math.cos(ang - Math.PI) * 16.0, rect.y + Math.sin(ang - Math.PI) * 16.0, 4, 4, 2, true));
+            Damage.damages.add(new Damage(rect.x + Math.cos(ang) * 16.0, rect.y + Math.sin(ang) * 16.0, 4, 4, 2, true, false));
+            Damage.damages.add(new Damage(rect.x + Math.cos(ang - Math.PI) * 16.0, rect.y + Math.sin(ang - Math.PI) * 16.0, 4, 4, 2, true, false));
         }
     }
 

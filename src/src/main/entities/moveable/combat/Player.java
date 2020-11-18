@@ -8,18 +8,27 @@ import engine.Utils;
 import engine.audio.Sounds;
 import engine.drawing.Camera;
 import engine.drawing.Draw;
+import engine.physics.Physics;
 import engine.physics.Point;
 import main.Constants;
 import main.Main;
 import main.Options;
 import main.entities.Damage;
+import main.entities.Entity;
 import main.entities.moveable.Moveable;
+import main.entities.projectiles.Arrow;
+
 import java.awt.Color;
 
 public class Player extends Moveable {
 
     enum Attacks {
         JAB, SWIPE, SPIN;
+    }
+
+    enum Weapons {
+        SWORD,
+        BOW
     }
 
     // angle of body and attacks
@@ -37,6 +46,11 @@ public class Player extends Moveable {
 
     int attackTime;
     Attacks attack;
+
+    Weapons weapon = Weapons.SWORD;
+
+    boolean blocking = false;
+    int blockTime;
 
     // used for debug, turns off collision
     boolean noClip = false;
@@ -73,6 +87,33 @@ public class Player extends Moveable {
             }
         }
 
+        // block
+        if(Input.keyDown(KeyCodes.SHIFT) && attackTime == 0) {
+            if(!blocking) {
+                blocking = true;
+                blockTime = 1;
+            }
+            if(--blockTime <= 0) {
+                blockTime = 10;
+                Damage.damages.add(new Damage(rect.x + Math.cos(angle-0.3f)*7.0, rect.y + Math.sin(angle-0.3f)*7.0, 8, 8, 0, false, true));
+                Damage.damages.add(new Damage(rect.x + Math.cos(angle+0.3f)*7.0, rect.y + Math.sin(angle+0.3f)*7.0, 8, 8, 0, false, true));
+            }
+        } else {
+            blocking = false;
+        }
+
+        // switch weapon
+        if(Input.keyClick(KeyCodes.NUM1)) {
+            if(weapon != Weapons.SWORD) {
+                weapon = Weapons.SWORD;
+            }
+        }
+        if(Input.keyClick(KeyCodes.NUM2)) {
+            if(weapon != Weapons.BOW) {
+                weapon = Weapons.BOW;
+            }
+        }
+
         // find speed
         double moveX = 0;
         double moveY = 0;
@@ -95,6 +136,11 @@ public class Player extends Moveable {
             if (moveX != 0 && moveY != 0) {
                 moveX /= 1.4;
                 moveY /= 1.4;
+            }
+
+            if(blocking) {
+                moveX /= 3;
+                moveY /= 3;
             }
 
             // handle dash move
@@ -141,57 +187,76 @@ public class Player extends Moveable {
         }
 
         // turn with right click using motion controls
-        if (Options.useMotionControl ? Input.mouseDown(2) : true) {
+        if (Options.useMotionControl ? Input.mouseDown(2) : !recordingAttack) {
             angle = Utils.turnTo(angle, Utils.pointTo(rect.x, rect.y, Input.mousePos.x, Input.mousePos.y), 0.2);
         }
 
         // motion control attack handling
-        if (Options.useMotionControl) {
-            // start tracking attack
-            if (Input.mouseClick(0)) {
-                recordingAttack = true;
-                angles = new ArrayList<Double>();
-            }
-            // track points 
-            if (recordingAttack) {
-                // stop tracking
-                if (!Input.mouseDown(0)) {
-                    recordingAttack = false;
-                    lastMousePos = null;
-                }
-
-                // first point
-                if (lastMousePos == null) {
-                    lastMousePos = new Point(Input.mousePos.x, Input.mousePos.y);
-                    // add points
-                } else {
-                    double ang = Utils.pointTo(lastMousePos, Input.mousePos);
-                    if (ang < 0) {
-                        ang = Math.PI * 2 + ang;
-                    }
-                    angles.add(ang);
-                    lastMousePos = new Point(Input.mousePos.x, Input.mousePos.y);
-
-                    // start looking for attacks after enough points
-                    if (angles.size() > 9) {
-                        analyzeAttack();
-                    }
-                }
-            }
-        } else {
-            // attack using normal input
-            if (attackTime == 0) {
+        if(!blocking) {
+            if(weapon == Weapons.BOW) {
                 if (Input.mouseClick(0)) {
-                    attack = Attacks.SWIPE;
-                    attackTime = 20;
+                    recordingAttack = true;
+                    lastMousePos = new Point(Input.mousePos.x, Input.mousePos.y);
                 }
-                if (Input.mouseClick(2)) {
-                    attack = Attacks.JAB;
-                    attackTime = 10;
+
+                if(recordingAttack && !Input.mouseDown(0)) {
+                    double ang = Utils.pointTo(Input.mousePos, lastMousePos);
+                    Entity.entities.add(new Arrow(rect.x + Math.cos(ang) * 10.0, rect.y + Math.sin(ang) * 10.0, ang));
+                    recordingAttack = false;
                 }
-                if (Input.mouseDown(0) && Input.mouseDown(2)) {
-                    attack = Attacks.SPIN;
-                    attackTime = 40;
+
+                if(recordingAttack) {
+                    angle = Utils.turnTo(angle, Utils.pointTo(Input.mousePos.x, Input.mousePos.y, lastMousePos.x, lastMousePos.y), 0.2);
+                }
+            } else {
+                if (Options.useMotionControl) {
+                    // start tracking attack
+                    if (Input.mouseClick(0)) {
+                        recordingAttack = true;
+                        angles = new ArrayList<Double>();
+                    }
+                    // track points 
+                    if (recordingAttack) {
+                        // stop tracking
+                        if (!Input.mouseDown(0)) {
+                            recordingAttack = false;
+                            lastMousePos = null;
+                        }
+
+                        // first point
+                        if (lastMousePos == null) {
+                            lastMousePos = new Point(Input.mousePos.x, Input.mousePos.y);
+                            // add points
+                        } else {
+                            double ang = Utils.pointTo(lastMousePos, Input.mousePos);
+                            if (ang < 0) {
+                                ang = Math.PI * 2 + ang;
+                            }
+                            angles.add(ang);
+                            lastMousePos = new Point(Input.mousePos.x, Input.mousePos.y);
+
+                            // start looking for attacks after enough points
+                            if (angles.size() > 9) {
+                                analyzeAttack();
+                            }
+                        }
+                    }
+                } else {
+                    // attack using normal input
+                    if (attackTime == 0) {
+                        if (Input.mouseClick(0)) {
+                            attack = Attacks.SWIPE;
+                            attackTime = 20;
+                        }
+                        if (Input.mouseClick(2)) {
+                            attack = Attacks.JAB;
+                            attackTime = 10;
+                        }
+                        if (Input.mouseDown(0) && Input.mouseDown(2)) {
+                            attack = Attacks.SPIN;
+                            attackTime = 40;
+                        }
+                    }
                 }
             }
         }
@@ -207,7 +272,7 @@ public class Player extends Moveable {
                     }
                     if (attackTime == 7 || attackTime == 3) {
                         double multi = 20 - attackTime;
-                        Damage.damages.add(new Damage(rect.x + Math.cos(angle) * multi + Math.cos(angle - Math.PI / 2.0) * -4, rect.y + Math.sin(angle) * multi + Math.sin(angle - Math.PI / 2.0) * -4, 4, 4, 2, false));
+                        Damage.damages.add(new Damage(rect.x + Math.cos(angle) * multi + Math.cos(angle - Math.PI / 2.0) * -4, rect.y + Math.sin(angle) * multi + Math.sin(angle - Math.PI / 2.0) * -4, 4, 4, 2, false, false));
                     }
                     break;
                 case SWIPE:
@@ -216,7 +281,7 @@ public class Player extends Moveable {
                     }
                     if (attackTime == 17 || attackTime == 13 || attackTime == 8) {
                         double ang = angle + (13 - attackTime) / 10.0;
-                        Damage.damages.add(new Damage(rect.x + Math.cos(ang) * 12.0, rect.y + Math.sin(ang) * 12.0, 4, 4, 2, false));
+                        Damage.damages.add(new Damage(rect.x + Math.cos(ang) * 12.0, rect.y + Math.sin(ang) * 12.0, 4, 4, 2, false, false));
                     }
                     break;
                 case SPIN:
@@ -225,10 +290,10 @@ public class Player extends Moveable {
                     }
                     if (attackTime % 2 == 0 && attackTime > 20) {
                         double ang = angle + (40 - attackTime) * 0.31415;
-                        Damage.damages.add(new Damage(rect.x + Math.cos(ang) * 14.0, rect.y + Math.sin(ang) * 14.0, 4, 4, 2, false));
+                        Damage.damages.add(new Damage(rect.x + Math.cos(ang) * 14.0, rect.y + Math.sin(ang) * 14.0, 4, 4, 2, false, false));
                     }
                     if (attackTime == 20) {
-                        Damage.damages.add(new Damage(rect.x + Math.cos(angle) * 14.0, rect.y + Math.sin(angle) * 14.0, 6, 6, 5, false));
+                        Damage.damages.add(new Damage(rect.x + Math.cos(angle) * 14.0, rect.y + Math.sin(angle) * 14.0, 6, 6, 5, false, false));
                     }
                     break;
             }
@@ -338,8 +403,36 @@ public class Player extends Moveable {
                     Draw.image("playerBody", (int) rect.x, (int) rect.y, angle + rotOff / 2.0, 1.0);
                     Draw.image("playerHead", (int) rect.x, (int) rect.y, angle, 1.0);
                     break;
+            }  
+        } else if(blocking) {
+            drawOff("playerShield", rect.x, rect.y, angle, 3, 5, angle);
+            drawOff("playerArmLeft", rect.x, rect.y, angle, 3, 3, angle);
+            drawOff("playerSword0", rect.x, rect.y, angle, -5, 1, angle);
+            drawOff("playerArmRight", rect.x, rect.y, angle, -5, -1, angle);
+            Draw.image("playerBody", (int) rect.x, (int) rect.y, angle + ((walkCycle - 3) / 10.0), 1.0);
+            Draw.image("playerHead", (int) rect.x, (int) rect.y, angle, 1.0);
+        } else if(weapon == Weapons.BOW) {
+            if(recordingAttack) {
+                double dist = Physics.dist(lastMousePos, Input.mousePos);
+                if(dist < 50) {
+                    drawOff("playerBow1", rect.x, rect.y, angle-Math.PI/2.0, -3, -3, angle);
+                    drawOff("playerArmRight", rect.x, rect.y, angle, -2, -3, angle+Math.PI/5.0);
+                } else if(dist < 100) {
+                    drawOff("playerBow2", rect.x, rect.y, angle-Math.PI/2.0, -3, -3, angle);
+                    drawOff("playerArmRight", rect.x, rect.y, angle, -2, -3, angle+Math.PI/4.0);
+                } else {
+                    drawOff("playerBow3", rect.x, rect.y, angle-Math.PI/2.0, -3, -3, angle);
+                    drawOff("playerArmRight", rect.x, rect.y, angle, -2, -3, angle+Math.PI/2.0);
+                }
+                drawOff("playerArmLeft", rect.x, rect.y, angle, -2, 6, angle+Math.PI/2.0);
+                Draw.image("playerBody", (int) rect.x, (int) rect.y, angle + 1.5, 1.0);
+            } else {
+                drawOff("playerBow0", rect.x, rect.y, angle, 5, 3, angle);
+                drawOff("playerArmLeft", rect.x, rect.y, angle, 5, 1, angle);
+                drawOff("playerArmRight", rect.x, rect.y, angle, -5, 1, angle);
+                Draw.image("playerBody", (int) rect.x, (int) rect.y, angle + ((walkCycle - 3) / 10.0), 1.0);
             }
-            // unanimated
+            Draw.image("playerHead", (int) rect.x, (int) rect.y, angle, 1.0);
         } else {
             drawOff("playerShield", rect.x, rect.y, angle, 5, 3, angle);
             drawOff("playerArmLeft", rect.x, rect.y, angle, 5, 1, angle);
@@ -356,6 +449,12 @@ public class Player extends Moveable {
         int size = (int) Utils.mapRange(hp, 0, maxHp, 0, 16);
         Draw.setColor(new Color(43, 104, 237, 200));
         Draw.rect((int) rect.x - (8 - size / 2), (int) rect.y + 12, size, 2);
+
+        // line
+        if(weapon == Weapons.BOW && recordingAttack) {
+            Draw.setColor(new Color(230, 237, 21, 100));
+            Draw.line(lastMousePos, Input.mousePos);
+        }
 
         // hit box
         if (Utils.debugMode) {

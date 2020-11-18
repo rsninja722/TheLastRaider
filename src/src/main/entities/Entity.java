@@ -25,6 +25,7 @@ public class Entity {
     public boolean neutral = false;
     public int hp;
     public int maxHp;
+    public boolean ignoreCollision = false;
 
     public Entity(double x, double y, int w, int h) {
         this.rect = new Rect(x, y, w, h);
@@ -73,12 +74,12 @@ public class Entity {
     public static Entity colliding(Rect r) {
 
         for (int i = 0; i < entities.size(); i++) {
-            Rect rect = entities.get(i).rect;
-            if (rect.x == r.x && rect.y == r.y) {
+            Entity e = entities.get(i);
+            if ((e.rect.x == r.x && e.rect.y == r.y) || e.ignoreCollision) {
                 continue;
             }
 
-            if (Physics.rectrect(rect, r)) {
+            if (Physics.rectrect(e.rect, r)) {
                 return entities.get(i);
             }
         }

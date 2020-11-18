@@ -9,6 +9,7 @@ import engine.physics.Physics;
 import engine.physics.Point;
 import main.Main;
 import main.entities.moveable.Moveable;
+import main.entities.moveable.combat.enemies.Part;
 import main.util.AStar;
 import java.awt.Color;
 
@@ -43,6 +44,7 @@ public class Enemy extends Moveable {
     @Override
     public boolean update() {
         if (hp < 1) {
+            Part.addParts(rect.x, rect.y, 5);
             Sounds.play("enemydeath" + Utils.rand(0, 4));
             return true;
         }

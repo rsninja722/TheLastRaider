@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import engine.audio.Sounds;
 import main.Main;
+import main.Music;
 import main.Options;
 
 // buttons and slider for options menu
@@ -34,6 +35,7 @@ public class OptionsUI {
     }
 
     public static void setVolume() {
+        Music.volume = components.get(3).percent;
         Sounds.globalVolume(components.get(3).percent);
     }
 }

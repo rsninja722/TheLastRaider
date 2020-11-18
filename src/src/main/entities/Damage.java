@@ -29,10 +29,13 @@ public class Damage {
 
     boolean affectPlayer;
 
-    public Damage(double x, double y, int w, int h, int amount, boolean affectPlayer) {
+    boolean counterOtherDamage;
+
+    public Damage(double x, double y, int w, int h, int amount, boolean affectPlayer, boolean counterOtherDamage) {
         rect = new Rect(x, y, w, h);
         this.amount = amount;
         this.affectPlayer = affectPlayer;
+        this.counterOtherDamage = counterOtherDamage;
     }
 
     public boolean update() {
@@ -41,7 +44,15 @@ public class Damage {
             return true;
         }
 
-        if (affectPlayer) {
+        if(counterOtherDamage) {
+            for (int i = 0; i < damages.size(); i++) {
+                Damage d = damages.get(i);
+                if(!d.counterOtherDamage) {
+                    d.timeOut = 0;
+                    Sounds.play("bonk");
+                }
+            }
+        } else if (affectPlayer) {
             // damage player, then de-spawn
             if (Physics.rectrect(rect, Main.player.rect)) {
                 Main.player.hp--;
@@ -82,6 +93,11 @@ public class Damage {
     }
 
     public void draw() {
+        if(counterOtherDamage) {
+            Draw.setColor(Color.CYAN);
+        } else {
+            Draw.setColor(Color.RED);
+        }
         Draw.rectOutline(rect);
     }
 
@@ -95,7 +111,6 @@ public class Damage {
 
     public static void drawAll() {
         if (Utils.debugMode) {
-            Draw.setColor(Color.RED);
             for (int i = 0; i < damages.size(); i++) {
                 damages.get(i).draw();
             }

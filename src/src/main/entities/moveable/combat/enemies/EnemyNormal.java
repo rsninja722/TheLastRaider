@@ -26,7 +26,7 @@ public class EnemyNormal extends Enemy {
         }
         if (attackTime == 13 || attackTime == 8 || attackTime == 3) {
             double ang = angle + (-7 + attackTime) / 10.0;
-            Damage.damages.add(new Damage(rect.x + Math.cos(ang) * 10.0, rect.y + Math.sin(ang) * 10.0, 4, 4, 5, true));
+            Damage.damages.add(new Damage(rect.x + Math.cos(ang) * 10.0, rect.y + Math.sin(ang) * 10.0, 4, 4, 5, true, false));
         }
     }
 

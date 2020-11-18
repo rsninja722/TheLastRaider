@@ -4,14 +4,11 @@ import main.entities.Entity;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import engine.Utils;
 import engine.drawing.Draw;
 import engine.physics.Physics;
-import engine.physics.Point;
 import engine.physics.Rect;
-import main.Constants;
 import main.Main;
 
 public class Moveable extends Entity {
@@ -73,12 +70,12 @@ public class Moveable extends Entity {
         // find all collisions
         ArrayList<Integer> indexes = new ArrayList<Integer>();
         for (int i = 0; i < entities.size(); i++) {
-            Rect r = entities.get(i).rect;
-            if (rect.x == r.x && rect.y == r.y) {
+            Entity e = entities.get(i);
+            if ((rect.x == e.rect.x && rect.y == e.rect.y) || e.ignoreCollision) {
                 continue;
             }
 
-            if (Physics.rectrect(rect, r)) {
+            if (Physics.rectrect(rect, e.rect)) {
                 indexes.add(i);
             }
         }

@@ -26,8 +26,7 @@ public class EnemyLight extends Enemy {
         }
         if (attackTime == 7 || attackTime == 3) {
             double multi = 18 - attackTime;
-            Damage.damages
-                    .add(new Damage(rect.x + Math.cos(angle) * multi, rect.y + Math.sin(angle) * multi, 4, 4, 5, true));
+            Damage.damages.add(new Damage(rect.x + Math.cos(angle) * multi, rect.y + Math.sin(angle) * multi, 4, 4, 5, true, false));
         }
     }
 
